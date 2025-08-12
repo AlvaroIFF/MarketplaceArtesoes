@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Usuário</title>
+</head>
+<body th:object="${usuario}">
+
+    <h1 th:text="*{nome}">Nome Placeholder</h1>
+
+    <h2>Dados Pessoais</h2>
+    <hr>
+    <p><strong>CPF:</strong> <span th:text="*{cpf}">CPF Placeholder</span></p>
+    <p><strong>Data de Nascimento:</strong> 
+        <span th:text="*{#dates.format(dtNasc, 'dd/MM/yyyy')}">Data Placeholder</span>
+    </p>
+
+    <h2>Dados de Contato</h2>
+    <hr>
+    <p><strong>Celular:</strong> <span th:text="*{numContato}">Celular Placeholder</span></p>
+    <p><strong>E-mail:</strong> <span th:text="*{email}">E-mail Placeholder</span></p>
+
+    <hr>
+    <p><strong>User ID:</strong> <span th:text="*{id}">ID Placeholder</span></p>
+
+</body>
+</html>
