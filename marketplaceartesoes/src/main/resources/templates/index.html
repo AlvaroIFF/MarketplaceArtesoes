@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-    <meta charset="UTF-8">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <title>HomePage</title>
-</head>
+<head th:replace="~{baseLayout :: baseHead(titulo='Home Page')}">
+    </head>
 
 <body>
-    <h1>Está funcionando</h1>
+    <header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+    
+    <main>
+        <p>Bem-vindo à página inicial do Marketplace Artesões!</p>
+    </main>
 </body>
 
 </html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="baseHead">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{app.title}">App Title</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <header th:fragment="baseHeaderPage">
+        <nav>
+            <ul>
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/produtos}">Produtos</a></li>
+                <li><a th:href="@{/clientes}">Área do Cliente</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div th:fragment="conteudo"></div>
+    </main>
+
+</body>
+</html>

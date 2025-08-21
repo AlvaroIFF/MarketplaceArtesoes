@@ -1,4 +1,4 @@
-package br.edu.iff.ccc.marketplaceartesoes.marketplaceartesoes.controller.restapi;
+package br.edu.iff.ccc.marketplaceartesoes.controller.restapi;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
