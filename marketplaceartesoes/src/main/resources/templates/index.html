@@ -1,15 +1,80 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{baseLayout :: baseHead(titulo='Home Page')}">
-    </head>
-
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
 <body>
-    <header th:replace="~{baseLayout :: baseHeaderPage}"></header>
-    
-    <main>
-        <p>Bem-vindo à página inicial do Marketplace Artesões!</p>
-    </main>
-</body>
 
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Onde a criatividade encontra um lar.</h1>
+            <p>Descubra peças únicas, feitas à mão com paixão por artesões de todo o Brasil.</p>
+            <a th:href="@{/produtos}" class="btn-primary">Explorar Produtos</a>
+        </div>
+    </section>
+
+    <section class="featured-products">
+        <h2>Produtos em Destaque</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                 <a th:href="@{/produtos/1}"> <img th:src="@{/images/vaso-ceramica.jpg}" alt="Foto do Produto">
+                     <h3>Vaso de Cerâmica</h3>
+                     <p class="artisan-name">Maria Silva</p>
+                     <p class="price">R$ 120,00</p>
+                 </a>
+            </div>
+            <div class="product-card">
+                 <a th:href="@{/produtos/2}">
+                     <img th:src="@{/images/bolsa-croche.jpg}" alt="Foto do Produto">
+                     <h3>Bolsa de Crochê</h3>
+                     <p class="artisan-name">João Costa</p>
+                     <p class="price">R$ 85,50</p>
+                 </a>
+            </div>
+             <div class="product-card">
+                 <a th:href="@{/produtos/3}">
+                     <img th:src="@{/images/colar-prata.jpg}" alt="Foto do Produto">
+                     <h3>Colar de Prata</h3>
+                     <p class="artisan-name">Ana Pereira</p>
+                     <p class="price">R$ 250,00</p>
+                 </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories">
+        <h2>Navegue por Categorias</h2>
+        <div class="category-grid">
+            <a th:href="@{/produtos(categoria='ceramica')}" class="category-card">
+                <span>🏺</span>
+                <h3>Cerâmica</h3>
+            </a>
+            <a th:href="@{/produtos(categoria='texteis')}" class="category-card">
+                <span>🧶</span>
+                <h3>Têxteis</h3>
+            </a>
+            <a th:href="@{/produtos(categoria='joias')}" class="category-card">
+                <span>💍</span>
+                <h3>Jóias</h3>
+            </a>
+            <a th:href="@{/produtos(categoria='madeira')}" class="category-card">
+                <span>🪵</span>
+                <h3>Madeira</h3>
+            </a>
+        </div>
+    </section>
+
+    <section class="meet-artisans">
+        <h2>Nossa alma são os nossos artesões</h2>
+        <p>Cada peça conta a história de quem a fez. Conheça alguns dos talentos por trás do nosso marketplace.</p>
+        <a th:href="@{/artesoes}" class="btn-secondary">Ver todos os artesões</a>
+    </section>
+
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
 </html>
