@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ClienteController {
     
     @GetMapping
-    public String listarClientes() {
-        return "clientes/lista";
+    public String loginCliente() {
+        return "clientes/login";
     }
 
     @GetMapping("/cadastro")

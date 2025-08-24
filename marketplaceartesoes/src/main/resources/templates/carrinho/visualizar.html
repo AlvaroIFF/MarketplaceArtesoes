@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Carrinho - Visualizar</title>
-</head>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
 <body>
-    <h1>Carrinho - Visualizar</h1>
-    <p>Página: Carrinho - Visualizar</p>
+    <header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+    
+    <main class="conteudo">
+        <h1>Carrinho - Visualizar</h1>
+        <p>Página: Carrinho - Visualizar</p>
+    </main>
+
+    <footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
 </body>
 </html>
