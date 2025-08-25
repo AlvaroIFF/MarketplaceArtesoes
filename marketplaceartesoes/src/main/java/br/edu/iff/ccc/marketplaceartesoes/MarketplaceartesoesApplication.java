@@ -1,4 +1,4 @@
-package br.edu.iff.ccc.marketplaceartesoes.marketplaceartesoes;
+package br.edu.iff.ccc.marketplaceartesoes;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
