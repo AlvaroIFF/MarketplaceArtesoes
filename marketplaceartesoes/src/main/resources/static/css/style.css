@@ -295,3 +295,70 @@ main.conteudo {
     background-color: #333;
     color: white;
 }
+/* === Layout da Página de Detalhes do Produto === */
+
+/* Cria um container flexível para alinhar a imagem e as informações lado a lado */
+.product-detail {
+    display: flex;
+    gap: 30px; /* Adiciona um espaço entre a imagem e as informações */
+    margin-top: 20px;
+    align-items: flex-start; /* Alinha os itens no topo */
+}
+
+/* Define o tamanho da coluna da imagem */
+.product-detail-image {
+    flex: 1; /* Ocupa metade do espaço disponível */
+    max-width: 50%;
+}
+
+/* A MÁGICA ACONTECE AQUI */
+.product-detail-image img {
+    width: 100%; /* A imagem ocupará 100% da largura do seu container (.product-detail-image) */
+    height: auto; /* A altura se ajustará automaticamente para manter a proporção */
+    border-radius: 8px; /* Borda arredondada para um visual mais suave */
+}
+
+/* Define o tamanho da coluna de informações */
+.product-detail-info {
+    flex: 1; /* Ocupa a outra metade do espaço */
+    max-width: 50%;
+}
+
+/* === Página de Sucesso do Pedido === */
+.order-success-page {
+    text-align: center;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.order-success-page .success-icon span {
+    font-size: 50px;
+}
+
+.order-success-page h2 {
+    color: #28a745; /* Verde sucesso */
+    margin-bottom: 20px;
+}
+
+.order-success-page .order-number {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+}
+
+.order-success-page .order-number strong {
+    font-size: 1.2em;
+    color: #333;
+}
+
+.order-success-page .actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}

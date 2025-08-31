@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+    <section class="cart-page">
+        <h2>Meu Carrinho de Compras</h2>
+
+        <div th:if="${carrinho.itens.isEmpty()}" class="cart-empty">
+            <p>Seu carrinho está vazio.</p>
+            <a th:href="@{/produtos}" class="btn-primary">Continuar Comprando</a>
+        </div>
+
+        <div th:if="${!carrinho.itens.isEmpty()}" class="cart-container">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th colspan="2">Produto</th>
+                        <th>Preço Unitário</th>
+                        <th>Quantidade</th>
+                        <th>Subtotal</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${carrinho.itens}">
+                        <td class="product-image">
+                            <img th:src="${item.imagemUrl}" alt="Imagem do Produto" />
+                        </td>
+                        <td class="product-name">
+                            <a th:href="@{/produtos/{id}(id=${item.produtoId})}" th:text="${item.nomeProduto}">Nome do Produto</a>
+                        </td>
+                        <td th:text="${#numbers.formatCurrency(item.precoUnitario)}">R$ 0,00</td>
+                        <td>
+                            <form th:action="@{/carrinho/atualizar}" method="post" class="form-update-quantity">
+                                <input type="hidden" name="produtoId" th:value="${item.produtoId}" />
+                                <input type="number" name="quantidade" th:value="${item.quantidade}" min="1" class="item-quantity">
+                                <button type="submit" class="btn-update">Atualizar</button>
+                            </form>
+                        </td>
+                        <td th:text="${#numbers.formatCurrency(item.getSubtotal())}">R$ 0,00</td>
+                        <td class="product-actions">
+                            <form th:action="@{/carrinho/remover/{id}(id=${item.produtoId})}" method="post">
+                                <button type="submit" class="btn-remove">Remover</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="cart-summary">
+                <h3>Resumo do Pedido</h3>
+                <div class="summary-row">
+                    <span>Total de Itens:</span>
+                    <strong th:text="${carrinho.totalItens}">0</strong>
+                </div>
+                <div class="summary-row total">
+                    <span>Valor Total:</span>
+                    <strong th:text="${#numbers.formatCurrency(carrinho.valorTotal)}">R$ 0,00</strong>
+                </div>
+                <a th:href="@{/checkout}" class="btn-primary btn-checkout">Finalizar Compra</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>
