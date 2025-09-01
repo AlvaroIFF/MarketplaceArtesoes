@@ -1,156 +1,97 @@
-# Projeto MarketplaceArtesoes
+# Marketplace de Artesões - Projeto P1
 
-## Descrição
-MarketplaceArtesoes é um marketplace online onde artesãos podem exibir seus produtos e clientes podem descobrir e comprar peças únicas feitas à mão. A plataforma conecta criadores e compradores em um ambiente fácil de usar, promovendo o comércio justo e o artesanato local.
+## 📜 Sobre o Projeto
 
+O **Marketplace de Artesões** é uma plataforma de e-commerce desenvolvida como parte da avaliação P1 da disciplina de Programação Web. O principal objetivo do projeto é criar um ambiente online onde artesãos de todo o Brasil possam criar suas lojas virtuais para expor e vender seus produtos, e os clientes possam descobrir e comprar peças artesanais únicas.
 
+A aplicação simula um fluxo completo de e-commerce, incluindo:
+-   Dois tipos de perfis de usuário: **Clientes** e **Artesãos**.
+-   Cadastro e login unificado para ambos os tipos de usuário.
+-   Visualização de produtos em uma vitrine principal.
+-   Página de detalhes para cada produto.
+-   Funcionalidade de carrinho de compras persistente por sessão.
+-   Fluxo de finalização de compra (checkout) para clientes logados.
+-   Dashboard para o artesão visualizar e cadastrar novos produtos em sua loja.
 
-## **Tecnologias Utilizadas** 🛠️
+Atualmente, o projeto utiliza listas em memória para simular a persistência de dados, com foco na implementação das regras de negócio e na interação entre os componentes do backend e a interface do usuário.
 
-### **Front-end**
-- 
-### **Back-end**
-- 
-### **Banco de Dados**
-- 
-### **Infraestrutura**
-- 
-## Documentação da API
+## 🛠️ Tecnologias Utilizadas
 
+Este projeto foi construído utilizando o ecossistema Spring e tecnologias modernas de desenvolvimento Java:
 
-#### Retorna todos os itens
+-   **Backend:**
+    -   Java 17
+    -   Spring Boot 3.5.4
+    -   Spring Web (para a construção de controllers e APIs RESTful)
+    -   Spring Data JPA / Hibernate (para o mapeamento objeto-relacional das entidades)
+-   **Frontend:**
+    -   Thymeleaf (motor de templates para renderizar as páginas HTML dinamicamente)
+    -   HTML5
+    -   CSS3
+-   **Banco de Dados (Desenvolvimento):**
+    -   H2 Database (banco de dados em memória/arquivo, ideal para desenvolvimento e testes)
+-   **Gerenciamento de Dependências e Build:**
+    -   Apache Maven
 
+## 🚀 Como Executar o Projeto
 
-```http
- GET /api/items
-```
+Para clonar, compilar e executar esta aplicação em seu ambiente local, siga os passos abaixo.
 
+### Pré-requisitos
 
-| Parâmetro   | Tipo       | Descrição                           |
-| :---------- | :--------- | :---------------------------------- |
-| `api_key` | `string` | **Obrigatório**. Aqui vai ter algo, mas ainda não tem |
+Antes de começar, certifique-se de que você tem os seguintes softwares instalados em sua máquina:
+-   **Java Development Kit (JDK) 17 ou superior.**
+-   **Apache Maven 3.6 ou superior.**
+-   **Git** (para clonar o repositório).
 
+### Passo a Passo
 
-#### Retorna um item
+**1. Clone o Repositório**
 
-
-```http
- GET /api/items/${id}
-```
-
-
-| Parâmetro   | Tipo       | Descrição                                   |
-| :---------- | :--------- | :------------------------------------------ |
-| `id`      | `string` | **Obrigatório**. Aqui vai ter algo, mas ainda não tem |
-
-
-## Apêndice
-
-
-
-
-
-
-
-## Autores
-
-- [AlvaroIFF](https://github.com/AlvaroIFF)
-- [@ctrlPedroPinheiro](https://github.com/ctrlPedroPinheiro)
-
-
-
-
-## Etiquetas
-
-
-![bug](https://img.shields.io/badge/bug%20-%20%23d73a4a)
-![documentation](https://img.shields.io/badge/documentation%20-%20%230075ca)
-![duplicate](https://img.shields.io/badge/duplicate%20-%20%23cfd3d7)
-![enhancement](https://img.shields.io/badge/enhancement%20-%20%23a2eeef)
-![epic](https://img.shields.io/badge/epic%20-%20%23b185f6)
-![good first issue](https://img.shields.io/badge/good%20first%20issue%20-%20%237057ff)
-![help wanted](https://img.shields.io/badge/help%20wanted%20-%20%23008672)
-![invalid](https://img.shields.io/badge/invalid%20-%20%23e4e669)
-![question](https://img.shields.io/badge/question%20-%20%23d876e3)
-![userstory](https://img.shields.io/badge/userstory%20-%20%23d4880a)
-![wonfix](https://img.shields.io/badge/wontfix%20-%20%23ffffff)
-
-
-
-## Documentação de cores
-
-
-| Cor               | Hexadecimal                                                |
-| ----------------- | ---------------------------------------------------------------- |
-| Cor exemplo       | ![#0a192f](https://via.placeholder.com/10/0a192f?text=+) #0a192f |
-| Cor exemplo       | ![#f8f8f8](https://via.placeholder.com/10/f8f8f8?text=+) #f8f8f8 |
-| Cor exemplo       | ![#00b48a](https://via.placeholder.com/10/00b48a?text=+) #00b48a |
-| Cor exemplo       | ![#00d1a0](https://via.placeholder.com/10/00b48a?text=+) #00d1a0 |
-
-
-
-
-
-
-## Demonstração
-
-
-Aqui virá nosso protótipo quando ele existir
-
-
-
-
-## Uso/Exemplos
-
-
-```javascript
-import Component from 'my-project'
-
-
-function App() {
- return <Component />
-}
-```
-
-## Classes
-
-Aqui virão as Classes
-
-## Casos de uso
-
-Aqui virão os casos de uso
-
-
-## Rodando localmente
-
-
-Clone o projeto
-
+Abra seu terminal ou Git Bash e utilize o seguinte comando para clonar o projeto:
 
 ```bash
- git clone https://github.com/AlvaroIFF/MarketplaceArtesoes
+git clone https://github.com/AlvaroIFF/MarketplaceArtesoes.git
+cd MarketplaceArtesoes
 ```
 
+**2. Compile o Projeto com Maven**
 
-Entre no diretório do projeto
-
+Navegue até a pasta raiz do projeto (onde o arquivo `pom.xml` está localizado) e execute o comando abaixo para que o Maven baixe todas as dependências e compile o código:
 
 ```bash
- cd my-project
+mvn clean install
 ```
+Este comando irá gerar um arquivo `.jar` na pasta `target/`.
 
+**3. Execute a Aplicação**
 
-Instale as dependências
+Você pode executar a aplicação de duas maneiras:
 
+**Opção A: Diretamente pelo Maven**
+
+Este é o método mais simples para desenvolvimento. Na pasta raiz do projeto, execute:
 
 ```bash
- npm install
+mvn spring-boot:run
 ```
 
+**Opção B: Utilizando o arquivo JAR gerado**
 
-Inicie o servidor
-
+Após compilar o projeto (passo 2), você pode executar o arquivo JAR diretamente:
 
 ```bash
- npm run start
+java -jar target/marketplaceartesoes-0.0.1-SNAPSHOT.jar
 ```
+
+**4. Acesse a Aplicação**
+
+Após iniciar o servidor, abra seu navegador de internet e acesse as seguintes URLs:
+
+-   **Página Inicial:** [http://localhost:8080/](http://localhost:8080/)
+-   **Console do Banco H2:** [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+    -   **JDBC URL:** `jdbc:h2:file:./data/exemplo`
+    -   **User Name:** `admin` 
+    -   **Password:** `admin`
+
+A aplicação estará rodando e pronta para ser utilizada!

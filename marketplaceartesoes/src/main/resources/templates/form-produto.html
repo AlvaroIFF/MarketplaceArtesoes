@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+    <section class="form-container">
+        <h2>Cadastrar Novo Produto</h2>
+
+        <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
+        <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
+
+        <form th:action="@{/artesao/produtos/salvar}" method="post">
+            <div class="form-group">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="preco">Preço (ex: 99.90):</label>
+                <input type="number" step="0.01" id="preco" name="preco" required>
+            </div>
+            <div class="form-group">
+                <label for="estoque">Quantidade em Estoque:</label>
+                <input type="number" id="estoque" name="estoque" required>
+            </div>
+            <div class="form-group">
+                <label for="imagemUrl">URL da Imagem Principal:</label>
+                <input type="text" id="imagemUrl" name="imagemUrl" placeholder="/images/meu-produto.jpg" required>
+            </div>
+             <div class="form-group">
+                <label for="categoriaId">Categoria:</label>
+                <select id="categoriaId" name="categoriaId">
+                    <option value="1">Cerâmica</option>
+                    <option value="2">Têxteis</option>
+                    <option value="3">Jóias</option>
+                    <option value="4">Madeira</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-primary">Salvar Produto</button>
+        </form>
+    </section>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>

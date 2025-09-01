@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+    <section class="product-listing">
+        <h2>Nossos Produtos</h2>
+        
+        <div class="product-grid">
+            <div class="product-card" th:each="produto : ${produtos}">
+                <a th:href="@{/produtos/{id}(id=${produto.id})}">
+                    <img th:src="${produto.imagemUrl}" alt="Foto do Produto">
+                    <h3 th:text="${produto.nome}">Nome do Produto</h3>
+                    <p class="artisan-name" th:text="${produto.nomeArtesao}">Nome do Artesão</p>
+                    <p class="price" th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</p>
+                </a>
+            </div>
+
+            <div th:if="${produtos.isEmpty()}">
+                <p>Nenhum produto encontrado.</p>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>

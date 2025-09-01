@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+    <section class="order-success-page">
+        <div class="success-icon">
+            <span>✔️</span>
+        </div>
+        <h2>Pedido Realizado com Sucesso!</h2>
+        
+        <p>Obrigado por comprar conosco! Seu pedido foi recebido e está sendo processado.</p>
+        
+        <div class="order-number">
+            <span>Número do seu Pedido:</span>
+            <strong th:text="${numeroPedido}">#00000</strong>
+        </div>
+        
+        <p>Você receberá atualizações sobre o status do seu pedido por e-mail.</p>
+        
+        <div class="actions">
+            <a th:href="@{/produtos}" class="btn-secondary">Continuar Comprando</a>
+            <a th:href="@{/clientes/area-cliente}" class="btn-primary">Ver Meus Pedidos</a>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>

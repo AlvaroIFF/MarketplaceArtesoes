@@ -14,8 +14,33 @@
             <ul>
                 <li><a th:href="@{/}">Home</a></li>
                 <li><a th:href="@{/produtos}">Produtos</a></li>
-                <li><a th:href="@{/clientes}">Área do Cliente</a></li>
-                <li><a th:href="@{/carrinho}">Carrinho</a></li>
+        
+                <li th:if="${session.usuarioLogado != null}">
+                    <a  th:if="${session.tipoUsuario == 'CLIENTE'}" 
+                        th:href="@{/clientes/area-cliente}" 
+                        th:text="${'Olá, ' + session.usuarioLogado.nome}">
+                    </a>
+                    <a th:if="${session.tipoUsuario == 'ARTESAO'}" 
+                        th:href="@{/artesao/dashboard}" 
+                        th:text="${'Olá, ' + session.usuarioLogado.nome}">
+                    </a>
+                </li>
+                <li th:if="${session.usuarioLogado != null}">
+                    <a th:href="@{/auth/logout}">Sair</a>
+                </li>
+
+                <li th:if="${session.usuarioLogado == null}">
+                    <a th:href="@{/cadastro}">Cadastre-se</a>
+                </li>
+                <li th:if="${session.usuarioLogado == null}">
+                    <a th:href="@{/auth/login}">Login</a>
+                </li>
+
+                <li>
+                    <a th:href="@{/carrinho}">
+                        Carrinho (<span th:text="${@carrinhoService.getCarrinho().totalItens}">0</span>)
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
