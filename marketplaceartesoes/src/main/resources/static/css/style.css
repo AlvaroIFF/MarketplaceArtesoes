@@ -362,3 +362,37 @@ main.conteudo {
     justify-content: center;
     gap: 15px;
 }
+
+/* === Página de Escolha de Cadastro === */
+.choice-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.choice-options {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.choice-card {
+    flex: 1;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.choice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.choice-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+}

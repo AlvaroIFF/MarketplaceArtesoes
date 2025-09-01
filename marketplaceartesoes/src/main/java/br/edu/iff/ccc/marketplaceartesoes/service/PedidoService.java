@@ -33,18 +33,30 @@ public class PedidoService {
         if (carrinho.itens().isEmpty()) {
             throw new IllegalStateException("Não é possível criar um pedido com o carrinho vazio.");
         }
-        
+    
         // Busca a entidade Cliente completa a partir do ID do DTO
         Cliente clienteEntidade = clienteService.buscarEntidadePorId(clienteDto.id());
 
         Pedido novoPedido = new Pedido();
         novoPedido.setId(idContador.getAndIncrement());
         novoPedido.setValorTotal(carrinho.valorTotal());
-        
-        // CORREÇÃO PRINCIPAL AQUI:
-        // Associamos a entidade Cliente completa, não apenas o ID.
+    
+        // Associa a entidade Cliente ao pedido (Lado 1 da relação)
         novoPedido.setCliente(clienteEntidade);
-
+        // Adiciona o novo pedido à lista de pedidos do cliente
+        clienteEntidade.getPedidos().add(novoPedido);
+ 
+        /* 
+        // Associa o endereço (vamos pegar o primeiro da lista do cliente como padrão)
+        if (clienteEntidade.getEnderecos() != null && !clienteEntidade.getEnderecos().isEmpty()) {
+            novoPedido.setEnderecoDeEntrega(clienteEntidade.getEnderecos().get(0));
+        } else {
+            // Se o cliente não tiver endereço, não podemos finalizar a compra.
+            // Em um sistema real, redirecionaríamos para a página de cadastro de endereço.
+            throw new IllegalStateException("Cliente não possui endereço de entrega cadastrado.");
+        }
+        */
+        
         carrinho.itens().forEach(itemCarrinho -> {
             ItemPedido itemPedido = new ItemPedido();
             itemPedido.setPrecoUnitario(itemCarrinho.precoUnitario());

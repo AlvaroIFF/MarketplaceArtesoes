@@ -1,5 +1,6 @@
 package br.edu.iff.ccc.marketplaceartesoes.service;
 
+import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDetalheDTO;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Artesao;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional; // Usaremos Optional para o parâmetro
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,33 +37,75 @@ public class ProdutoService {
         catJoias.setId(3L);
         catJoias.setNome("Jóias");
         
-        // Artesão 1
+        // Artesão 1 e sua loja/produto
         Artesao artesao1 = new Artesao("Maria Silva", "11111111111", LocalDate.now().minusYears(30), "21999999991", "maria@email.com", "senha123", null);
+        artesao1.setId(101L); // <-- ADICIONE ESTA LINHA
         Loja loja1 = new Loja("Ateliê da Maria", "Cerâmicas artesanais", null, artesao1);
+        artesao1.setLoja(loja1); // Garante a relação bidirecional
         Produto produto1 = new Produto("Vaso de Cerâmica", "Vaso feito à mão", new BigDecimal("120.00"), 10, loja1);
-        produto1.setId(1L);
+        produto1.setId(1L); 
         produto1.setImagemPrincipalUrl("/images/vaso-ceramica.jpg");
-        produto1.getCategorias().add(catCeramica); // Associando categoria
-
-        // Artesão 2
+        produto1.getCategorias().add(catCeramica);
+        
+        // Artesão 2 e sua loja/produto
         Artesao artesao2 = new Artesao("João Costa", "22222222222", LocalDate.now().minusYears(45), "11988888882", "joao@email.com", "senha123", null);
+        artesao2.setId(102L); // <-- ADICIONE ESTA LINHA
         Loja loja2 = new Loja("Fios e Nós", "Bolsas e acessórios em crochê", null, artesao2);
+        artesao2.setLoja(loja2); // Garante a relação bidirecional
         Produto produto2 = new Produto("Bolsa de Crochê", "Bolsa de ombro colorida", new BigDecimal("85.50"), 15, loja2);
         produto2.setId(2L);
         produto2.setImagemPrincipalUrl("/images/bolsa-croche.jpg");
-        produto2.getCategorias().add(catTexteis); // Associando categoria
+        produto2.getCategorias().add(catTexteis);
 
-        // Artesão 3
+        // Artesão 3 e sua loja/produto
         Artesao artesao3 = new Artesao("Ana Pereira", "33333333333", LocalDate.now().minusYears(28), "81977777773", "ana@email.com", "senha123", null);
+        artesao3.setId(103L); // <-- ADICIONE ESTA LINHA
         Loja loja3 = new Loja("Prata da Casa", "Jóias artesanais em prata", null, artesao3);
+        artesao3.setLoja(loja3); // Garante a relação bidirecional
         Produto produto3 = new Produto("Colar de Prata", "Colar com pingente de lua", new BigDecimal("250.00"), 5, loja3);
         produto3.setId(3L);
         produto3.setImagemPrincipalUrl("/images/colar-prata.jpg");
-        produto3.getCategorias().add(catJoias); // Associando categoria
+        produto3.getCategorias().add(catJoias);
 
         produtosEmMemoria.add(produto1);
         produtosEmMemoria.add(produto2);
         produtosEmMemoria.add(produto3);
+    }
+
+    /**
+    * Cadastra um novo produto para um artesão específico.
+    */
+    public void cadastrarProduto(ProdutoCadastroDTO dados, Artesao artesaoLogado) {
+        // Busca a loja do artesão logado
+        Loja lojaDoArtesao = artesaoLogado.getLoja();
+
+        // Cria a nova entidade Produto
+        Produto novoProduto = new Produto(
+            dados.nome(),
+            dados.descricao(),
+            dados.preco(),
+            dados.estoque(),
+            lojaDoArtesao // Associa o produto à loja correta
+        );
+        novoProduto.setId(new AtomicLong(produtosEmMemoria.size() + 1).getAndIncrement()); // Simula ID
+        novoProduto.setImagemPrincipalUrl(dados.imagemUrl());
+    
+        // Simulação de busca de categoria pelo ID
+        // Em um sistema real, teríamos um CategoriaService para buscar a categoria.
+        if (dados.categoriaId() != null) {
+            Categoria cat = new Categoria();
+            cat.setId(dados.categoriaId());
+            // Apenas para exemplo, não temos o nome aqui
+            if (dados.categoriaId() == 1L) cat.setNome("Cerâmica"); 
+           if (dados.categoriaId() == 2L) cat.setNome("Têxteis");
+            if (dados.categoriaId() == 3L) cat.setNome("Jóias");
+        
+            novoProduto.getCategorias().add(cat);
+        }
+    
+        // Adiciona o novo produto à lista em memória
+        produtosEmMemoria.add(novoProduto);
+        System.out.println("Novo produto cadastrado: " + novoProduto.getNome() + " para a loja " + lojaDoArtesao.getNome());
     }
 
     /**
@@ -135,5 +179,16 @@ public class ProdutoService {
                 produto.getLoja().getNome(),
                 nomesCategoria
         );
+    }
+
+    /**
+    * Busca todos os produtos pertencentes a um artesão (pelo ID do artesão).
+    */
+    public List<ProdutoDTO> buscarPorArtesaoId(Long artesaoId) {
+        return produtosEmMemoria.stream()
+            // Filtra os produtos cuja loja pertence ao artesão com o ID informado
+            .filter(produto -> produto.getLoja().getArtesao().getId().equals(artesaoId))
+            .map(this::converterParaDTO)
+            .collect(Collectors.toList());
     }
 }

@@ -50,14 +50,18 @@ public class ClienteController {
 
     // Método para a ÁREA DO CLIENTE
     @GetMapping("/area-cliente")
-    public String exibirAreaCliente(HttpSession session, Model model) {
-        ClienteDTO clienteLogado = (ClienteDTO) session.getAttribute("clienteLogado");
-        if (clienteLogado == null) {
-            return "redirect:/auth/login"; // Protegendo a página
-        }
+public String exibirAreaCliente(HttpSession session, Model model) {
+    Object usuarioLogado = session.getAttribute("usuarioLogado");
+    String tipoUsuario = (String) session.getAttribute("tipoUsuario");
 
-        List<PedidoResumoDTO> pedidos = pedidoService.buscarPedidosPorCliente(clienteLogado.id());
-        model.addAttribute("cliente", clienteLogado);
+    if (usuarioLogado == null || !"CLIENTE".equals(tipoUsuario)) {
+        return "redirect:/auth/login";
+    }
+        ClienteDTO clienteDto = (ClienteDTO) usuarioLogado;
+    
+        List<PedidoResumoDTO> pedidos = pedidoService.buscarPedidosPorCliente(clienteDto.id());
+    
+        model.addAttribute("cliente", clienteDto);
         model.addAttribute("pedidos", pedidos);
 
         return "area-cliente";

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+    <section class="choice-container">
+        <h2>Como você deseja participar do nosso marketplace?</h2>
+        <p>Escolha uma opção para começar.</p>
+
+        <div class="choice-options">
+            <a th:href="@{/clientes/cadastro}" class="choice-card">
+                <div class="choice-icon">🛒</div>
+                <h3>Quero Comprar</h3>
+                <p>Crie uma conta de cliente para descobrir e comprar produtos artesanais únicos.</p>
+            </a>
+            
+            <a th:href="@{/artesao/cadastro}" class="choice-card">
+                <div class="choice-icon">🎨</div>
+                <h3>Quero Vender</h3>
+                <p>Crie sua conta de artesão, monte sua loja e comece a vender suas criações para todo o Brasil.</p>
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>

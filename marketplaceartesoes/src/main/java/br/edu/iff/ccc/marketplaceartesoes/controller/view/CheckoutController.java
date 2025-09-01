@@ -27,29 +27,31 @@ public class CheckoutController {
 
     @GetMapping
     public String processarCheckout(HttpSession session, RedirectAttributes redirectAttributes) {
-        // 1. Pega o cliente da sessão para verificar se está logado
-        ClienteDTO clienteLogado = (ClienteDTO) session.getAttribute("clienteLogado");
+        // Pega os dados da sessão unificada
+        Object usuarioLogado = session.getAttribute("usuarioLogado");
+        String tipoUsuario = (String) session.getAttribute("tipoUsuario");
 
-        // 2. Se não houver cliente na sessão, redireciona para o login
-        if (clienteLogado == null) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Você precisa fazer login para finalizar a compra.");
+        // Verifica se o usuário é nulo OU se não é um CLIENTE
+        if (usuarioLogado == null || !"CLIENTE".equals(tipoUsuario)) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Você precisa fazer login como cliente para finalizar a compra.");
             return "redirect:/auth/login";
         }
         
-        // 3. Se estiver logado, continua o processo
+        // Se passou pela verificação, podemos converter o objeto para ClienteDTO
+        ClienteDTO clienteDto = (ClienteDTO) usuarioLogado;
+        
         CarrinhoDTO carrinho = carrinhoService.getCarrinho();
         if (carrinho.itens().isEmpty()) {
-            // Não deveria acontecer se o botão só aparece com itens, mas é uma boa verificação
             return "redirect:/carrinho";
         }
 
-        // 4. Cria o pedido
-        Pedido novoPedido = pedidoService.criarPedido(carrinho, clienteLogado);
+        // Cria o pedido
+        Pedido novoPedido = pedidoService.criarPedido(carrinho, clienteDto);
 
-        // 5. Limpa o carrinho da sessão
+        // Limpa o carrinho
         carrinhoService.limparCarrinho();
 
-        // 6. Redireciona para uma página de sucesso
+        // Redireciona para a página de sucesso
         redirectAttributes.addFlashAttribute("pedidoId", novoPedido.getId());
         return "redirect:/pedidos/sucesso";
     }
