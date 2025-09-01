@@ -36,7 +36,11 @@ public class ProdutoService {
         Categoria catJoias = new Categoria();
         catJoias.setId(3L);
         catJoias.setNome("Jóias");
-        
+
+        Categoria catMadeira = new Categoria();
+        catMadeira.setId(4L);
+        catMadeira.setNome("Madeira");
+
         // Artesão 1 e sua loja/produto
         Artesao artesao1 = new Artesao("Maria Silva", "11111111111", LocalDate.now().minusYears(30), "21999999991", "maria@email.com", "senha123", null);
         artesao1.setId(101L); // <-- ADICIONE ESTA LINHA
@@ -67,9 +71,24 @@ public class ProdutoService {
         produto3.setImagemPrincipalUrl("/images/colar-prata.jpg");
         produto3.getCategorias().add(catJoias);
 
+        // Produto 4 Loja 1
+        Produto produto4 = new Produto("Conjunto de Banheiro", "Guarda sabão, escova e cotonete", new BigDecimal("45.00"), 8, loja1);
+        produto4.setId(4L);
+        produto4.setImagemPrincipalUrl("/images/conjunto-banheiro.jpg");
+        produto4.getCategorias().add(catCeramica);
+
+        // Produto 5 Loja 2
+        Produto produto5 = new Produto("Toalhas de Algodão", "Toalhas de banho e rosto", new BigDecimal("60.00"), 12, loja2);
+        produto5.setId(5L);
+        produto5.setImagemPrincipalUrl("/images/toalhas.jpg");
+        produto5.getCategorias().add(catTexteis);
+        
+
         produtosEmMemoria.add(produto1);
         produtosEmMemoria.add(produto2);
         produtosEmMemoria.add(produto3);
+        produtosEmMemoria.add(produto4);
+        produtosEmMemoria.add(produto5);
     }
 
     /**

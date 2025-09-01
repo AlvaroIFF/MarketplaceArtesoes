@@ -1,15 +1,16 @@
+/* ==========================================================================
+   1. ESTILOS GERAIS E LAYOUT PRINCIPAL
+   ========================================================================== */
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #ffecd1;
     color: #222;
-}
-
-.container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; 
+    min-height: 100vh;
 }
 
 header {
@@ -17,12 +18,39 @@ header {
     background-color: #554834;
     color: white;
     padding: 20px 0;
+    flex-shrink: 0; /* Impede o header de encolher */
 }
 
 header h1 {
     margin: 0 0 15px 0;
     font-size: 1.8rem;
 }
+
+main.conteudo {
+    flex-grow: 1; /* Faz o <main> expandir para empurrar o footer para baixo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Classe especial para a home page não ser centralizada */
+.conteudo-home {
+    display: block;
+    padding: 0;
+}
+
+footer {
+    text-align: center;
+    background: #554834;
+    color: white;
+    padding: 10px;
+    flex-shrink: 0; /* Impede o footer de encolher */
+}
+
+/* ==========================================================================
+   2. NAVEGAÇÃO (MENU)
+   ========================================================================== */
 
 .menu ul {
     list-style: none;
@@ -41,119 +69,152 @@ header h1 {
 }
 
 .menu a:hover {
-    color: #ffcc00; 
+    color: #ffcc00;
 }
 
-main.conteudo {
-    flex: 1; 
-    padding: 20px;
-}
 
-footer {
+/* ==========================================================================
+   3. COMPONENTES REUTILIZÁVEIS (Formulários, Botões, Alertas, Tabelas)
+   ========================================================================== */
+
+/* --- Formulários --- */
+.form-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    background: #554834;
-    color: white;
-    padding: 10px;
 }
 
+.form-container h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+}
 
-label {
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
     display: block;
-    margin-top: 1em;
+    margin-bottom: 5px;
     font-weight: bold;
 }
 
-input,
-textarea {
-    width: 300px;
-    padding: 8px;
-    border: 1px solid #bbb;
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1em;
 }
 
-input:focus,
-textarea:focus {
-    border-color: #666;
-    outline: none;
+.form-link {
+    margin-top: 20px;
 }
 
-button {
-    margin-top: 1.5em;
+/* --- Botões --- */
+button, .btn-primary, .btn-secondary, .btn-update, .btn-remove, .btn-checkout {
     padding: 10px 15px;
     cursor: pointer;
     border: none;
     border-radius: 4px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button {
+    margin-top: 1.5em;
     background-color: #333;
     color: white;
-    font-weight: bold;
-    transition: background 0.3s ease;
+}
+button:hover { background-color: #555; }
+
+.btn-primary {
+    background-color: #ffcc00;
+    color: #333;
+    padding: 12px 25px;
+}
+.btn-primary:hover { background-color: #e6b800; }
+
+.form-container .btn-primary { /* Estilo específico para botões em formulários */
+    width: 100%;
 }
 
-button:hover {
-    background-color: #555;
+.btn-secondary {
+    background-color: transparent;
+    border: 2px solid #333;
+    color: #333;
+    padding: 10px 20px;
+}
+.btn-secondary:hover {
+    background-color: #333;
+    color: white;
 }
 
+.btn-checkout {
+    background-color: #007bff;
+    color: white;
+    display: block;
+    width: 100%;
+    margin-top: 25px;
+}
+.btn-checkout:hover { background-color: #0056b3; }
+
+.btn-update { background-color: #28a745; color: white; padding: 6px 10px; }
+.btn-update:hover { background-color: #218838; }
+
+.btn-remove { background-color: #dc3545; color: white; padding: 6px 10px; }
+.btn-remove:hover { background-color: #c82333; }
+
+/* --- Alertas e Erros --- */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    text-align: center;
+}
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
 .error {
     color: #880000;
     font-size: 0.9em;
     margin-top: 5px;
 }
 
-.alert {
-    padding: 12px 18px;
-    margin: 15px 0;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    display: inline-block;
-    font-size: 0.95em;
-}
-
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-
-.alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
-
+/* --- Tabelas --- */
 table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 1em;
 }
+tr { border-bottom: 1px solid #ddd; }
+th, td { padding: 10px; text-align: left; }
+th { background-color: #f2f2f2; font-weight: bold; }
 
-tr {
-    border-bottom: 1px solid #ddd;
-}
+/* ==========================================================================
+   4. ESTILOS ESPECÍFICOS POR PÁGINA
+   ========================================================================== */
 
-th,
-td {
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 150px;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-/* --- HOMEPAGE --- */
+/* --- Home Page (index.html) --- */
 .hero {
-    background-image: url('../images/pagina-inicial.jpg'); 
+    background-image: url('../images/pagina-inicial.jpg');
     background-size: cover;
     background-position: center;
     color: white;
@@ -161,45 +222,16 @@ th {
     padding: 100px 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
 }
-
-.hero h1 {
-    font-size: 2.8rem;
-    margin-bottom: 10px;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin: 0 auto 30px auto;
-}
-
-.btn-primary {
-    background-color: #ffcc00;
-    color: #333;
-    padding: 12px 25px;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: #e6b800;
-}
-
-main.conteudo {
-    padding: 0; 
-}
+.hero h1 { font-size: 2.8rem; margin-bottom: 10px; }
+.hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px auto; }
 
 .featured-products, .categories, .meet-artisans {
     padding: 40px 20px;
     text-align: center;
 }
-
 .featured-products h2, .categories h2, .meet-artisans h2 {
     font-size: 2rem;
     margin-bottom: 30px;
-    color: #333;
 }
 
 .product-grid {
@@ -209,7 +241,6 @@ main.conteudo {
     max-width: 1200px;
     margin: 0 auto;
 }
-
 .product-card {
     background: white;
     border: 1px solid #ddd;
@@ -218,181 +249,239 @@ main.conteudo {
     text-align: left;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.product-card a {
-    text-decoration: none;
-    color: inherit;
+.product-card a { text-decoration: none; color: inherit; }
+.product-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.product-card img { width: 100%; height: 200px; object-fit: cover; }
+.product-card h3, .product-card .artisan-name, .product-card .price { padding: 0 15px; margin: 10px 0; }
+.product-card h3 { font-size: 1.2rem; }
+.product-card .price { font-weight: bold; font-size: 1.1rem; padding-bottom: 15px; }
+
+.category-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.category-card { background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; min-width: 150px; text-decoration: none; color: #333; }
+.category-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.category-card span { font-size: 3rem; }
+.category-card h3 { margin: 10px 0 0 0; }
+
+.meet-artisans { background-color: #f7f1e6; }
+
+/* --- Cart Page (carrinho.html) --- */
+.cart-page h2 { text-align: center; margin-bottom: 30px; }
+.cart-empty { text-align: center; margin-top: 50px; padding: 20px; border: 1px dashed #ccc; border-radius: 8px; background-color: #f9f9f9; }
+.cart-empty p { font-size: 1.2em; margin-bottom: 20px; }
+.cart-container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+.cart-table { flex: 2; min-width: 500px; width: 100%; margin-bottom: 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+.cart-table thead th { background-color: #f5f5f5; }
+.cart-table .product-image img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
+.form-update-quantity { display: flex; align-items: center; gap: 5px; }
+.item-quantity { width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+.cart-summary { flex: 1; min-width: 300px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.cart-summary h3 { margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1em; }
+.summary-row.total { font-weight: bold; font-size: 1.3em; border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; }
+
+/* ==========================================================================
+   5. RESPONSIVIDADE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .cart-container { flex-direction: column; }
+    .cart-table, .cart-summary { min-width: unset; width: 100%; }
 }
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+@media (max-width: 480px) {
+    .form-update-quantity { flex-direction: column; align-items: flex-start; }
+    .item-quantity { width: 50px; margin-bottom: 5px; }
 }
 
-.product-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
+/* ==========================================================================
+   PÁGINA DE DETALHES DO PRODUTO (detalhe-produto.html)
+   ========================================================================== */
 
-.product-card h3, .product-card .artisan-name, .product-card .price {
-    padding: 0 15px;
-    margin: 10px 0;
-}
-
-.product-card h3 {
-    font-size: 1.2rem;
-}
-
-.product-card .price {
-    font-weight: bold;
-    font-size: 1.1rem;
-    padding-bottom: 15px;
-}
-
-.category-grid {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.category-card {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    min-width: 150px;
-    text-align: center;
-    text-decoration: none;
-    color: #333;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.category-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-.category-card span {
-    font-size: 3rem;
-}
-.category-card h3 {
-    margin: 10px 0 0 0;
-}
-
-.meet-artisans {
-    background-color: #f7f1e6; 
-}
-.btn-secondary {
-    background-color: transparent;
-    border: 2px solid #333;
-    color: #333;
-    padding: 10px 20px;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-.btn-secondary:hover {
-    background-color: #333;
-    color: white;
-}
-/* === Layout da Página de Detalhes do Produto === */
-
-/* Cria um container flexível para alinhar a imagem e as informações lado a lado */
+/* Container principal que alinha a imagem e as informações lado a lado */
 .product-detail {
     display: flex;
-    gap: 30px; /* Adiciona um espaço entre a imagem e as informações */
-    margin-top: 20px;
-    align-items: flex-start; /* Alinha os itens no topo */
-}
-
-/* Define o tamanho da coluna da imagem */
-.product-detail-image {
-    flex: 1; /* Ocupa metade do espaço disponível */
-    max-width: 50%;
-}
-
-/* A MÁGICA ACONTECE AQUI */
-.product-detail-image img {
-    width: 100%; /* A imagem ocupará 100% da largura do seu container (.product-detail-image) */
-    height: auto; /* A altura se ajustará automaticamente para manter a proporção */
-    border-radius: 8px; /* Borda arredondada para um visual mais suave */
-}
-
-/* Define o tamanho da coluna de informações */
-.product-detail-info {
-    flex: 1; /* Ocupa a outra metade do espaço */
-    max-width: 50%;
-}
-
-/* === Página de Sucesso do Pedido === */
-.order-success-page {
-    text-align: center;
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 30px;
-    border: 1px solid #ddd;
+    flex-wrap: wrap; /* Permite que os itens quebrem para a linha de baixo em telas pequenas */
+    gap: 40px; /* Espaço entre a imagem e as informações */
+    max-width: 1100px; /* Largura máxima para todo o conteúdo da página */
+    margin: 40px auto; /* Centraliza o container na página */
+    padding: 20px;
+    background-color: var(--cor-fundo-card);
     border-radius: 8px;
-    background-color: #f9f9f9;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.order-success-page .success-icon span {
-    font-size: 50px;
+/* Container da imagem (coluna da esquerda) */
+.product-detail-image {
+    flex: 1; /* Tenta ocupar metade do espaço */
+    min-width: 300px; /* Largura mínima antes de quebrar a linha */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.order-success-page h2 {
-    color: #28a745; /* Verde sucesso */
+/* A IMAGEM EM SI - AQUI CONTROLAMOS O TAMANHO */
+.product-detail-image img {
+    max-width: 100%;  /* Garante que a imagem nunca ultrapasse o container dela */
+    
+    /* ***** VOCÊ PODE MUDAR O VALOR ABAIXO ***** */
+    max-height: 500px; /* Define uma ALTURA MÁXIMA para a imagem */
+    
+    width: auto;      /* Deixa a largura se ajustar para manter a proporção */
+    height: auto;     /* Deixa a altura se ajustar para manter a proporção */
+    
+    border-radius: 8px;
+    object-fit: contain; /* Garante que a imagem inteira apareça, sem cortes */
+    border: 1px solid var(--cor-borda);
+}
+
+/* Container das informações (coluna da direita) */
+.product-detail-info {
+    flex: 1; /* Tenta ocupar a outra metade do espaço */
+    min-width: 300px;
+    text-align: left;
+}
+
+.product-detail-info h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.product-detail-info .price {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--cor-primaria);
     margin-bottom: 20px;
 }
 
-.order-success-page .order-number {
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #e9ecef;
-    border-radius: 5px;
+.product-detail-info .description {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 30px;
 }
 
-.order-success-page .order-number strong {
-    font-size: 1.2em;
-    color: #333;
-}
-
-.order-success-page .actions {
-    margin-top: 30px;
+.product-detail-info .actions {
     display: flex;
-    justify-content: center;
+    align-items: center;
     gap: 15px;
 }
 
-/* === Página de Escolha de Cadastro === */
-.choice-container {
+.product-detail-info .actions input[type="number"] {
+    width: 70px;
+    padding: 10px;
     text-align: center;
-    max-width: 800px;
-    margin: 40px auto;
+    border: 1px solid var(--cor-borda);
+    border-radius: 5px;
 }
 
+/* ==========================================================================
+   PÁGINA DE ESCOLHA DE CADASTRO (escolha-cadastro.html)
+   ========================================================================== */
+
+/* Container principal da página de escolha */
+.choice-container {
+    max-width: 800px;
+    margin: 40px auto; /* Centraliza o container */
+    padding: 40px;
+    text-align: center;
+}
+
+.choice-container h2 {
+    font-size: 2.2em;
+    margin-bottom: 15px;
+    color: var(--cor-texto-principal);
+}
+
+.choice-container p {
+    font-size: 1.1em;
+    color: #6c757d; /* Um cinza suave */
+    margin-bottom: 40px;
+}
+
+/* Container que alinha os dois painéis de escolha */
 .choice-options {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    margin-top: 30px;
+    gap: 40px; /* Espaço entre os dois painéis */
+    flex-wrap: wrap; /* Permite que os painéis quebrem a linha em telas menores */
 }
 
+/* O estilo do painel clicável - A MÁGICA ACONTECE AQUI */
 .choice-card {
-    flex: 1;
-    padding: 30px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    flex: 1; /* Faz cada painel tentar ocupar o mesmo espaço */
+    min-width: 300px; /* Largura mínima antes de quebrar a linha */
+    padding: 40px 30px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    background-color: var(--cor-fundo-card);
     text-decoration: none;
-    color: #333;
-    transition: transform 0.2s, box-shadow 0.2s;
+    color: var(--cor-texto-principal);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+
+    /* Efeito suave de transição ao passar o mouse */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Efeito de "levantar" o painel ao passar o mouse por cima */
 .choice-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: var(--cor-primaria);
 }
 
+/* Estilo para o ícone (emoji) */
 .choice-icon {
-    font-size: 40px;
-    margin-bottom: 15px;
+    font-size: 3.5em; /* Aumenta o tamanho do emoji */
+    margin-bottom: 20px;
+    display: block;
+}
+
+.choice-card h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.choice-card p {
+    font-size: 1em;
+    line-height: 1.5;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   PÁGINAS DE DASHBOARD (Area Cliente e Area Artesão)
+   ========================================================================== */
+
+/* Container geral para as seções dos dashboards */
+.user-dashboard {
+    max-width: 1100px; /* Largura máxima do conteúdo */
+    margin: 40px auto; /* Centraliza a seção na página */
+    padding: 20px;
+    text-align: left;
+}
+
+.user-dashboard h2 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--cor-borda);
+    padding-bottom: 10px;
+}
+
+.dashboard-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px; /* Espaço entre as colunas "Meus Dados" e "Histórico de Pedidos" */
+}
+
+.user-details, .order-history, .product-management {
+    flex: 1; /* Faz as colunas dividirem o espaço */
+    min-width: 300px;
+    background-color: var(--cor-fundo-card);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.user-details h3, .order-history h3, .product-management h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5em;
 }
