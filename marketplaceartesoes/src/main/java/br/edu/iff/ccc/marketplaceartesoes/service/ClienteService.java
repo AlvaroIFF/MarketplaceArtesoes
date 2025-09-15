@@ -3,29 +3,39 @@ package br.edu.iff.ccc.marketplaceartesoes.service;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteDTO;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Cliente;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ClienteNaoEncontrado;
+import br.edu.iff.ccc.marketplaceartesoes.repository.ClienteRepository; 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 @Service
 public class ClienteService {
 
-    // Lista em memória para simular o banco de dados de clientes
-    private static final List<Cliente> clientesEmMemoria = new ArrayList<>();
-    // Simulando o auto-incremento do ID do banco
-    private static final AtomicLong idContador = new AtomicLong(1);
+    // 1. Injetar o repositório em vez de usar a lista em memória
+    private final ClienteRepository clienteRepository;
+
+    @Autowired // O Spring injetará o ClienteRepository automaticamente
+    public ClienteService(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+    }
+
+    // 2. A lista em memória e o contador de ID foram removidos.
 
     /**
-     * Cria um novo cliente e o salva na lista em memória.
+     * Cria um novo cliente e o salva no banco de dados.
      */
+    @Transactional // Garante que a operação seja atômica
     public void cadastrarCliente(ClienteCadastroDTO dadosCadastro) {
-        // Validação simples (em um projeto real, isso seria mais robusto)
+        // Validação de senha
         if (!dadosCadastro.senha().equals(dadosCadastro.confirmarSenha())) {
             throw new IllegalArgumentException("As senhas não conferem!");
         }
-        if (buscarPorEmail(dadosCadastro.email()) != null) {
+
+        // Verifica se o e-mail já está em uso no banco de dados
+        if (clienteRepository.findByEmail(dadosCadastro.email()).isPresent()) {
             throw new IllegalArgumentException("Este e-mail já está em uso.");
         }
 
@@ -40,12 +50,9 @@ public class ClienteService {
                 null // fotoUrl inicial é nula
         );
 
-        // Simulando o ID gerado pelo banco
-        novoCliente.setId(idContador.getAndIncrement());
-
-        clientesEmMemoria.add(novoCliente);
-        System.out.println("Cliente cadastrado com sucesso: " + novoCliente.getNome());
-        System.out.println("Total de clientes na memória: " + clientesEmMemoria.size());
+        // O ID será gerado automaticamente pelo JPA ao salvar, não precisamos de idContador.
+        clienteRepository.save(novoCliente); // Salva o novo cliente no banco de dados
+        System.out.println("Cliente cadastrado com sucesso: " + novoCliente.getNome() + " (ID: " + novoCliente.getId() + ")");
     }
     
     /**
@@ -53,25 +60,32 @@ public class ClienteService {
      * @return um ClienteDTO se o login for bem-sucedido.
      * @throws IllegalArgumentException se as credenciais forem inválidas.
      */
+    @Transactional(readOnly = true) // Apenas lê dados
     public ClienteDTO fazerLogin(String email, String senha) {
-        Cliente cliente = buscarPorEmail(email);
+        // Busca o cliente pelo e-mail no banco
+        Optional<Cliente> clienteOptional = clienteRepository.findByEmail(email);
 
         // Verifica se o cliente existe e se a senha está correta
-        if (cliente != null && cliente.getSenha().equals(senha)) {
+        // (Em um projeto real, a senha seria comparada com uma versão criptografada)
+        if (clienteOptional.isPresent() && clienteOptional.get().getSenha().equals(senha)) {
             // Sucesso! Retorna um DTO com os dados seguros do cliente.
-            return converterParaDTO(cliente);
+            return converterParaDTO(clienteOptional.get());
         }
 
         // Se chegou até aqui, o login falhou.
         throw new IllegalArgumentException("E-mail ou senha inválidos.");
     }
 
-    // Método auxiliar para verificar se o e-mail já existe
-    public Cliente buscarPorEmail(String email) {
-        return clientesEmMemoria.stream()
-                .filter(cliente -> cliente.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
+    /**
+     * Busca uma entidade Cliente pelo seu ID.
+     * @param id O ID do cliente a ser buscado.
+     * @return A entidade Cliente.
+     * @throws ClienteNaoEncontrado se o cliente não for encontrado.
+     */
+    @Transactional(readOnly = true)
+    public Cliente buscarEntidadePorId(Long id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new ClienteNaoEncontrado(id));
     }
 
     /**
@@ -87,18 +101,5 @@ public class ClienteService {
                 cliente.getEmail(),
                 cliente.getFotoUrl()
         );
-    }
-
-    /**
-     * Busca uma entidade Cliente pelo seu ID.
-     * Usado internamente para associar o cliente a um pedido.
-     */
-    public Cliente buscarEntidadePorId(Long id) {
-        return clientesEmMemoria.stream()
-                .filter(cliente -> cliente.getId().equals(id))
-                .findFirst()
-                // Lança uma exceção se o cliente não for encontrado.
-                // Isso ajuda a identificar erros caso algo inesperado aconteça.
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado para o ID: " + id));
     }
 }

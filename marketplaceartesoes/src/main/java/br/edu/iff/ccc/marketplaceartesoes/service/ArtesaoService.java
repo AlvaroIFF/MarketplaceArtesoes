@@ -4,55 +4,68 @@ import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Artesao;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Loja;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ArtesaoNaoEncontrado; 
+import br.edu.iff.ccc.marketplaceartesoes.repository.ArtesaoRepository; 
+import br.edu.iff.ccc.marketplaceartesoes.repository.LojaRepository; 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 @Service
 public class ArtesaoService {
 
-    // Lista em memória para simular o banco de dados de artesãos
-    private static final List<Artesao> artesoesEmMemoria = new ArrayList<>();
-    private static final AtomicLong idContador = new AtomicLong(100); // Começando de 100 para não colidir com IDs de clientes
+    private final ArtesaoRepository artesaoRepository;
+    private final LojaRepository lojaRepository;
+
+    @Autowired
+    public ArtesaoService(ArtesaoRepository artesaoRepository, LojaRepository lojaRepository) {
+        this.artesaoRepository = artesaoRepository;
+        this.lojaRepository = lojaRepository;
+    }
+
 
     /**
-     * Cria um novo Artesão e sua Loja, salvando-os na lista em memória.
+     * Cria um novo Artesão e sua Loja, salvando-os no banco de dados.
      */
+    @Transactional // Garante que a operação seja atômica
     public void cadastrarArtesao(ArtesaoCadastroDTO dados) {
-        // Validações básicas
         if (!dados.senha().equals(dados.confirmarSenha())) {
             throw new IllegalArgumentException("As senhas não conferem!");
         }
-        
-        // 1. Criar a entidade Artesao
+        if (artesaoRepository.findByEmail(dados.email()).isPresent()) {
+            throw new IllegalArgumentException("Este e-mail já está em uso por outro artesão.");
+        }
+        if (lojaRepository.findByCnpj(dados.cnpj()).isPresent()) {
+            throw new IllegalArgumentException("Este CNPJ já está em uso por outra loja.");
+        }
+        if (lojaRepository.findByNome(dados.nomeLoja()).isPresent()) {
+            throw new IllegalArgumentException("Já existe uma loja com este nome.");
+        }
+
         Artesao novoArtesao = new Artesao(
                 dados.nome(),
                 dados.cpf(),
                 dados.dtNasc(),
                 dados.numContato(),
                 dados.email(),
-                dados.senha(),
-                null // fotoUrl inicial
+                dados.senha(), 
+                null
         );
-        novoArtesao.setId(idContador.getAndIncrement());
 
-        // Criar a entidade Loja
         Loja novaLoja = new Loja(
                 dados.nomeLoja(),
                 dados.descricaoLoja(),
                 dados.cnpj(),
-                novoArtesao // <- Associando o artesão à loja no construtor
+                novoArtesao
         );
 
-        // Estabelecer a relação bidirecional
         novoArtesao.setLoja(novaLoja);
+
+        artesaoRepository.save(novoArtesao);
         
-        // Salvar na lista em memória
-        artesoesEmMemoria.add(novoArtesao);
-        
-        System.out.println("Artesão cadastrado com sucesso: " + novoArtesao.getNome());
+        System.out.println("Artesão cadastrado com sucesso: " + novoArtesao.getNome() + " (ID: " + novoArtesao.getId() + ")");
         System.out.println("Loja criada: " + novaLoja.getNome());
     }
 
@@ -60,37 +73,47 @@ public class ArtesaoService {
      * Tenta autenticar um artesão.
      * @param email O email para login.
      * @param senha A senha para login.
-     * @return um ArtesaoDTO se o login for bem-sucedido, ou null se falhar.
+     * @return um ArtesaoDTO se o login for bem-sucedido.
+     * @throws IllegalArgumentException se as credenciais forem inválidas.
      */
+    @Transactional(readOnly = true)
     public ArtesaoDTO fazerLogin(String email, String senha) {
-        Artesao artesao = buscarPorEmail(email);
-        if (artesao != null && artesao.getSenha().equals(senha)) {
-            return converterParaDTO(artesao);
+        Optional<Artesao> artesaoOptional = artesaoRepository.findByEmail(email);
+
+        if (artesaoOptional.isPresent() && artesaoOptional.get().getSenha().equals(senha)) {
+            return converterParaDTO(artesaoOptional.get());
         }
-        return null;
+        throw new IllegalArgumentException("E-mail ou senha inválidos para artesão.");
     }
 
+    /**
+     * Busca uma entidade Artesão completa pelo seu ID.
+     * @param id O ID do artesão a ser buscado.
+     * @return A entidade Artesao.
+     * @throws ArtesaoNaoEncontradoException se o artesão não for encontrado.
+     */
+    @Transactional(readOnly = true)
     public Artesao buscarEntidadePorId(Long id) {
-        return artesoesEmMemoria.stream()
-                .filter(artesao -> artesao.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return artesaoRepository.findById(id)
+                .orElseThrow(() -> new ArtesaoNaoEncontrado(id));
     }
     
-    private Artesao buscarPorEmail(String email) {
-        return artesoesEmMemoria.stream()
-                .filter(artesao -> artesao.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
+    // Método auxiliar para buscar um artesão por e-mail (agora usa o repositório)
+    @Transactional(readOnly = true)
+    public Optional<Artesao> buscarPorEmail(String email) {
+        return artesaoRepository.findByEmail(email);
     }
 
     private ArtesaoDTO converterParaDTO(Artesao artesao) {
+        String nomeLoja = artesao.getLoja() != null ? artesao.getLoja().getNome() : null;
+        String descricaoLoja = artesao.getLoja() != null ? artesao.getLoja().getDescricao() : null;
+
         return new ArtesaoDTO(
             artesao.getId(),
             artesao.getNome(),
             artesao.getEmail(),
-            artesao.getLoja().getNome(),
-            artesao.getLoja().getDescricao()
+            nomeLoja,
+            descricaoLoja
         );
     }
 }

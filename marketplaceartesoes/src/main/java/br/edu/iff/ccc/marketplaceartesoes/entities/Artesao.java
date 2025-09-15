@@ -4,13 +4,14 @@ import java.time.LocalDate;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 
 @Entity
 @DiscriminatorValue("ARTESAO") // Rótulo para esta classe na tabela 'usuarios'
 public class Artesao extends Usuario {
 
-    @OneToOne(mappedBy = "artesao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "artesao", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Loja loja;
 
     public Artesao() {

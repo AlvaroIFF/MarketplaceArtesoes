@@ -84,6 +84,11 @@ public class Produto implements Serializable {
         this.dtCriacao = LocalDate.now();
     }
 
+    public void adicionarCategoria(Categoria categoria) {
+        this.categorias.add(categoria);
+        categoria.getProdutos().add(this);
+    }
+
     // Getters e Setters
     public Long getId() {
         return id;

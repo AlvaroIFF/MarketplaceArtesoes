@@ -2,38 +2,68 @@ package br.edu.iff.ccc.marketplaceartesoes.service;
 
 import br.edu.iff.ccc.marketplaceartesoes.dto.CarrinhoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ItemCarrinhoDTO;
-import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDetalheDTO;
+import br.edu.iff.ccc.marketplaceartesoes.entities.Produto; 
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontrado;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap; 
+import java.util.Map; 
 
 @Service
-@SessionScope // Esta anotação instrui o Spring a criar uma instância separada desta classe para cada usuário
+@SessionScope 
 public class CarrinhoService {
 
-    private final List<ItemCarrinhoDTO> itens = new ArrayList<>();
+    
+    private final Map<Long, ItemCarrinhoDTO> itensMap = new ConcurrentHashMap<>();
+
+    // Injeção do ProdutoService para buscar informações atualizadas do produto
+    private final ProdutoService produtoService;
+
+    @Autowired
+    public CarrinhoService(ProdutoService produtoService) {
+        this.produtoService = produtoService;
+    }
 
     /**
      * Adiciona um item ao carrinho. Se o item já existir, apenas incrementa a quantidade.
+     * Busca os detalhes do produto do banco de dados para garantir informações atualizadas.
      */
-    public void adicionarItem(ProdutoDetalheDTO produto, int quantidade) {
-        // Verifica se o produto já está no carrinho
-        Optional<ItemCarrinhoDTO> itemExistente = buscarItemPorProdutoId(produto.id());
+    public void adicionarItem(Long produtoId, int quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("A quantidade deve ser positiva.");
+        }
 
-        if (itemExistente.isPresent()) {
+        // 1. Buscar o produto do banco de dados para obter as informações mais recentes
+        Produto produtoEntidade = produtoService.buscarEntidadeProdutoPorId(produtoId)
+                                                .orElseThrow(() -> new ProdutoNaoEncontrado(produtoId));
+
+        // 2. Tentar encontrar o item no carrinho
+        ItemCarrinhoDTO itemExistente = itensMap.get(produtoId);
+
+        if (itemExistente != null) {
             // Se existir, atualiza a quantidade
-            ItemCarrinhoDTO item = itemExistente.get();
-            int novaQuantidade = item.quantidade() + quantidade;
-            // Remove o antigo e adiciona o novo atualizado
-            itens.remove(item);
-            itens.add(new ItemCarrinhoDTO(produto.id(), produto.nome(), produto.preco(), novaQuantidade, produto.imagemUrl()));
+            int novaQuantidade = itemExistente.quantidade() + quantidade;
+            itensMap.put(produtoId, new ItemCarrinhoDTO(
+                produtoEntidade.getId(),
+                produtoEntidade.getNome(),
+                produtoEntidade.getPreco(),
+                novaQuantidade,
+                produtoEntidade.getImagemPrincipalUrl()
+            ));
         } else {
             // Se não existir, adiciona o novo item
-            itens.add(new ItemCarrinhoDTO(produto.id(), produto.nome(), produto.preco(), quantidade, produto.imagemUrl()));
+            itensMap.put(produtoId, new ItemCarrinhoDTO(
+                produtoEntidade.getId(),
+                produtoEntidade.getNome(),
+                produtoEntidade.getPreco(),
+                quantidade,
+                produtoEntidade.getImagemPrincipalUrl()
+            ));
         }
     }
 
@@ -41,9 +71,7 @@ public class CarrinhoService {
      * Remove um item completamente do carrinho, baseado no ID do produto.
      */
     public void removerItem(Long produtoId) {
-        // Usamos um Iterator para remover um item da lista enquanto a percorremos,
-        // o que evita problemas de concorrência.
-        itens.removeIf(item -> item.produtoId().equals(produtoId));
+        itensMap.remove(produtoId);
     }
     
     /**
@@ -56,46 +84,45 @@ public class CarrinhoService {
             return;
         }
 
-        Optional<ItemCarrinhoDTO> itemOpt = buscarItemPorProdutoId(produtoId);
-        if (itemOpt.isPresent()) {
-            ItemCarrinhoDTO itemAntigo = itemOpt.get();
-            // Criamos um novo item com a quantidade atualizada
-            ItemCarrinhoDTO itemNovo = new ItemCarrinhoDTO(
-                itemAntigo.produtoId(),
-                itemAntigo.nomeProduto(),
-                itemAntigo.precoUnitario(),
+        ItemCarrinhoDTO itemExistente = itensMap.get(produtoId);
+
+        if (itemExistente != null) {
+            // Garante que pegamos os dados mais recentes do produto, especialmente o preço.
+            Produto produtoEntidade = produtoService.buscarEntidadeProdutoPorId(produtoId)
+                                                    .orElseThrow(() -> new ProdutoNaoEncontrado(produtoId));
+
+            itensMap.put(produtoId, new ItemCarrinhoDTO(
+                produtoEntidade.getId(),
+                produtoEntidade.getNome(),
+                produtoEntidade.getPreco(),
                 novaQuantidade,
-                itemAntigo.imagemUrl()
-            );
-            // Removemos o antigo e adicionamos o novo
-            itens.remove(itemAntigo);
-            itens.add(itemNovo);
+                produtoEntidade.getImagemPrincipalUrl()
+            ));
         }
+        // Se o item não existir, não faz nada (ou você pode optar por lançar uma exceção)
     }
 
+    /**
+     * Limpa todos os itens do carrinho.
+     */
     public void limparCarrinho() {
-        itens.clear();
+        itensMap.clear();
     }
 
     /**
      * Retorna um DTO com o estado atual do carrinho.
      */
     public CarrinhoDTO getCarrinho() {
-        BigDecimal valorTotal = itens.stream()
+        List<ItemCarrinhoDTO> itensLista = new ArrayList<>(itensMap.values()); // Pega todos os valores do mapa
+
+        BigDecimal valorTotal = itensLista.stream()
                 .map(ItemCarrinhoDTO::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        int totalItens = itens.stream()
+        int totalItens = itensLista.stream()
                 .mapToInt(ItemCarrinhoDTO::quantidade)
                 .sum();
         
-        return new CarrinhoDTO(new ArrayList<>(itens), valorTotal, totalItens);
-    }
-    
-    // Método auxiliar para buscar um item na lista
-    private Optional<ItemCarrinhoDTO> buscarItemPorProdutoId(Long produtoId) {
-        return itens.stream()
-                .filter(item -> item.produtoId().equals(produtoId))
-                .findFirst();
+        return new CarrinhoDTO(itensLista, valorTotal, totalItens);
     }
 }

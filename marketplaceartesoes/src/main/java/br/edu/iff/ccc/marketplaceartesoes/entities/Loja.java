@@ -47,9 +47,8 @@ public class Loja implements Serializable {
     @Column(nullable = false)
     private LocalDate dtCriacao;
 
-    // Relacionamento com Artesao (Loja é a dona)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artesao_id", nullable = false, unique = true)
+    @JoinColumn(name = "artesao_id", nullable = false)
     private Artesao artesao;
 
     // Relacionamento com Produto
@@ -61,14 +60,13 @@ public class Loja implements Serializable {
         this.dtCriacao = LocalDate.now(); // Define a data de criação automaticamente
     }
 
-    // Construtor com campos essenciais
     public Loja(String nome, String descricao, String cnpj, Artesao artesao) {
         this.nome = nome;
         this.descricao = descricao;
         this.cnpj = cnpj;
         this.artesao = artesao;
-        this.dtCriacao = LocalDate.now();
     }
+
 
     // Getters e Setters
     public Long getId() {

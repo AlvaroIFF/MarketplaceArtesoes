@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*; // Importando tudo de persistence
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -21,7 +21,7 @@ public class Pedido implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime dtPedido;
+    private LocalDateTime dtPedido; 
 
     @NotNull
     @Positive
@@ -31,27 +31,29 @@ public class Pedido implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusPedido status;
+    private StatusPedido status; 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
     
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> itens = new ArrayList<>();
 
+    // Construtor padrão 
     public Pedido() {
-        this.dtPedido = LocalDateTime.now();
-        this.status = StatusPedido.AGUARDANDO_PAGAMENTO;
     }
 
-    // Getters e Setters (ajustados)
+    public Pedido(Cliente cliente, BigDecimal valorTotal) {
+        this.cliente = cliente;
+        this.valorTotal = valorTotal;
+        this.dtPedido = LocalDateTime.now(); 
+        this.status = StatusPedido.AGUARDANDO_PAGAMENTO; // Status inicial
+    }
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public LocalDateTime getDtPedido() {
@@ -78,7 +80,6 @@ public class Pedido implements Serializable {
         this.status = status;
     }
 
-    // Getter e Setter para o objeto Cliente
     public Cliente getCliente() {
         return cliente;
     }
@@ -93,5 +94,28 @@ public class Pedido implements Serializable {
 
     public void setItens(List<ItemPedido> itens) {
         this.itens = itens;
+    }
+
+    public void adicionarItem(ItemPedido item) {
+        this.itens.add(item);
+        item.setPedido(this); 
+    }
+
+    public void removerItem(ItemPedido item) {
+        this.itens.remove(item);
+        item.setPedido(null); 
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pedido pedido = (Pedido) o;
+        return getId() != null && getId().equals(pedido.getId()); 
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0; 
     }
 }
