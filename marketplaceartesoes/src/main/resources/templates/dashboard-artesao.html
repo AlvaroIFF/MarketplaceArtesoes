@@ -8,13 +8,19 @@
 <main class="conteudo conteudo-home">
     <section class="user-dashboard">
         <h2>Dashboard do Artesão</h2>
+
+        <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
+        <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
+
         <p>Bem-vindo(a), <strong th:text="${artesao.nome}">Nome do Artesão</strong>!</p>
 
         <div class="dashboard-content">
             <div class="user-details">
                 <h3>Informações da Loja</h3>
-                <p><strong>Nome da Loja:</strong> <span th.text="${artesao.nomeLoja}"></span></p>
-                <p><strong>Descrição:</strong> <span th.text="${artesao.descricaoLoja}"></span></p>
+                <p><strong>Nome da Loja:</strong> <span th:text="${artesao.nomeLoja}"></span></p>
+                <p><strong>Descrição:</strong> <span th:text="${artesao.descricaoLoja}"></span></p>
+                
+                <a th:href="@{/artesao/editar}" class="btn-secondary" style="margin-top: 15px;">Editar Perfil e Loja</a>
             </div>
 
             <div class="product-management">
@@ -38,7 +44,15 @@
                             <td th:text="${produto.nome}">Nome do Produto</td>
                             <td th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</td>
                             <td>
-                                <a href="#">Editar</a> | <a href="#">Remover</a>
+                                <a th:href="@{/artesao/produtos/editar/{id}(id=${produto.id})}">Editar</a> 
+                                | 
+                                <form th:action="@{/artesao/produtos/remover/{id}(id=${produto.id})}" 
+                                      method="post" 
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Tem certeza que deseja remover o produto \'' + this.dataset.nomeProduto + '\'?');"
+                                      th:data-nome-produto="${produto.nome}">
+                                    <button type="submit" class="link-button">Remover</button>
+                                </form>
                             </td>
                         </tr>
                     </tbody>

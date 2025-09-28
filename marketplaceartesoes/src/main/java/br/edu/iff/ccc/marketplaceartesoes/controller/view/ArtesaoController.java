@@ -2,89 +2,79 @@ package br.edu.iff.ccc.marketplaceartesoes.controller.view;
 
 import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoUpdateDTO; 
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoUpdateDTO; 
+import br.edu.iff.ccc.marketplaceartesoes.dto.CategoriaDTO; // NOVO: Importar CategoriaDTO
 import br.edu.iff.ccc.marketplaceartesoes.entities.Artesao;
+import br.edu.iff.ccc.marketplaceartesoes.entities.Produto; 
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ArtesaoNaoEncontradoException; 
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontradoException; 
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.RegraDeNegocioException;
 import br.edu.iff.ccc.marketplaceartesoes.service.ArtesaoService;
+import br.edu.iff.ccc.marketplaceartesoes.service.CategoriaService; 
+import br.edu.iff.ccc.marketplaceartesoes.service.FileStorageService;
 import br.edu.iff.ccc.marketplaceartesoes.service.ProdutoService;
 import jakarta.servlet.http.HttpSession;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
-@RequestMapping("/artesao") // Todas as URLs aqui começarão com /artesao
+@RequestMapping("/artesao")
 public class ArtesaoController {
 
     private final ArtesaoService artesaoService;
-    private static final List<Artesao> artesoesEmMemoria = new ArrayList<>();
-    @SuppressWarnings("unused")
-    private static final AtomicLong idContador = new AtomicLong(100);
     private final ProdutoService produtoService;
+    private final FileStorageService fileStorageService;
+    private final CategoriaService categoriaService; 
 
     @Autowired
-    public ArtesaoController(ArtesaoService artesaoService, ProdutoService produtoService) {
+    public ArtesaoController(ArtesaoService artesaoService, ProdutoService produtoService, FileStorageService fileStorageService, CategoriaService categoriaService) { 
         this.artesaoService = artesaoService;
         this.produtoService = produtoService;
+        this.fileStorageService = fileStorageService;
+        this.categoriaService = categoriaService; 
     }
 
-    /**
-     * Método para MOSTRAR a página com o formulário de cadastro de artesão.
-     */
+    // --- Métodos de Cadastro de Artesão ---
     @GetMapping("/cadastro")
-    public String exibirFormularioCadastro() {
-        return "cadastro-artesao"; // Retorna o nome do arquivo HTML
+    public String exibirFormularioCadastro(Model model) {
+        model.addAttribute("artesaoCadastroDTO", new ArtesaoCadastroDTO("", "", null, "", "", "", "", "", "", ""));
+        return "cadastro-artesao";
     }
 
-    /**
-     * Método para PROCESSAR os dados do formulário de cadastro.
-     */
     @PostMapping("/cadastrar")
-    public String cadastrarArtesao(ArtesaoCadastroDTO dados, RedirectAttributes redirectAttributes) {
+    public String cadastrarArtesao(@ModelAttribute ArtesaoCadastroDTO dados,
+                                   @RequestParam("foto") MultipartFile fotoPerfil,
+                                   @RequestParam("fotoLoja") MultipartFile fotoLoja,
+                                   RedirectAttributes redirectAttributes) {
         try {
-            artesaoService.cadastrarArtesao(dados);
-            // Se o cadastro for bem-sucedido, envia uma mensagem de sucesso para a tela de login
+            artesaoService.cadastrarArtesao(dados, fotoPerfil, fotoLoja);
             redirectAttributes.addFlashAttribute("mensagemSucesso", "Cadastro de artesão realizado com sucesso! Faça o login.");
             return "redirect:/auth/login";
-        } catch (IllegalArgumentException e) {
-            // Se houver um erro, volta para o formulário com uma mensagem de erro
+        } catch (RegraDeNegocioException e) {
             redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
             return "redirect:/artesao/cadastro";
         }
     }
 
-    /**
-     * Tenta autenticar um artesão.
-     */
-    public ArtesaoDTO fazerLogin(String email, String senha) {
-        Artesao artesao = buscarPorEmail(email);
-        if (artesao != null && artesao.getSenha().equals(senha)) {
-            return converterParaDTO(artesao);
-        }
-        // Retorna nulo se o login falhar. O controller tratará o erro.
-        return null;
-    }
-
+    // --- Método do Dashboard do Artesão ---
     @GetMapping("/dashboard")
     public String exibirDashboard(HttpSession session, Model model) {
         ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
         String tipoUsuario = (String) session.getAttribute("tipoUsuario");
 
-        // Protege a página: só pode acessar se for um artesão logado
         if (artesaoLogado == null || !"ARTESAO".equals(tipoUsuario)) {
             return "redirect:/auth/login";
         }
 
-        // Busca os produtos deste artesão
         List<ProdutoDTO> produtos = produtoService.buscarPorArtesaoId(artesaoLogado.id());
 
         model.addAttribute("artesao", artesaoLogado);
@@ -93,71 +83,194 @@ public class ArtesaoController {
         return "dashboard-artesao";
     }
 
-    /**
-    * Método para MOSTRAR a página com o formulário de cadastro de produto.
-    */
+    // --- Métodos de Edição de Artesão e Loja ---
+    @GetMapping("/editar")
+    public String exibirFormularioEdicao(HttpSession session, Model model) {
+        ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
+        if (artesaoLogado == null) {
+            return "redirect:/auth/login";
+        }
+
+        Artesao artesaoEntidade = artesaoService.buscarEntidadePorId(artesaoLogado.id());
+        model.addAttribute("artesaoUpdateDTO", new ArtesaoUpdateDTO(artesaoEntidade));
+        
+        return "editar-artesao";
+    }
+
+    @PostMapping("/editar/processar")
+    public String processarEdicao(@ModelAttribute ArtesaoUpdateDTO dadosUpdate, 
+                                  HttpSession session, 
+                                  RedirectAttributes redirectAttributes) {
+        ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
+        if (artesaoLogado == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            ArtesaoDTO artesaoAtualizado = artesaoService.atualizarArtesao(artesaoLogado.id(), dadosUpdate);
+            session.setAttribute("usuarioLogado", artesaoAtualizado);
+            
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Seus dados foram atualizados com sucesso!");
+            return "redirect:/artesao/dashboard";
+        } catch (RegraDeNegocioException | ArtesaoNaoEncontradoException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+            redirectAttributes.addFlashAttribute("artesaoUpdateDTO", dadosUpdate);
+            return "redirect:/artesao/editar";
+        }
+    }
+    
+    @PostMapping("/produtos/remover/{id}")
+    public String removerProduto(@PathVariable("id") Long id,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
+        if (artesaoLogado == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            produtoService.excluirProduto(id, artesaoLogado.id());
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Produto removido com sucesso!");
+            return "redirect:/artesao/dashboard";
+        } catch (RegraDeNegocioException | ProdutoNaoEncontradoException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+            return "redirect:/artesao/dashboard";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao remover o produto: " + e.getMessage());
+            return "redirect:/artesao/dashboard";
+        }
+    }
+
+    // --- Métodos de Cadastro de Produto ---
     @GetMapping("/produtos/novo")
-    public String exibirFormularioProduto(HttpSession session) {
-        // Proteção de rota
+    public String exibirFormularioProduto(HttpSession session, Model model) {
         if (session.getAttribute("usuarioLogado") == null || !"ARTESAO".equals(session.getAttribute("tipoUsuario"))) {
             return "redirect:/auth/login";
         }
-        return "form-produto"; // Nome do arquivo HTML
+        model.addAttribute("produtoCadastroDTO", new ProdutoCadastroDTO("", "", null, 0, "", null));
+        
+        List<CategoriaDTO> categorias = categoriaService.buscarTodas(); // CORRIGIDO PARA CategoriaDTO
+        model.addAttribute("categorias", categorias); 
+        
+        return "form-produto";
     }
 
-    /**
-     * Método para PROCESSAR os dados do formulário e salvar o novo produto.
-    */
     @PostMapping("/produtos/salvar")
-    public String salvarNovoProduto(ProdutoCadastroDTO dadosProduto, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String salvarNovoProduto(@ModelAttribute ProdutoCadastroDTO dadosProduto,
+                                     @RequestParam("imagemProduto") MultipartFile imagemProduto,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
         ArtesaoDTO artesaoDto = (ArtesaoDTO) session.getAttribute("usuarioLogado");
 
-        // Proteção de rota
         if (artesaoDto == null) {
             return "redirect:/auth/login";
         }
-    
-        // Busca a entidade completa do artesão para associar ao produto
-        Artesao artesaoEntidade = artesaoService.buscarEntidadePorId(artesaoDto.id());
 
         try {
-            produtoService.cadastrarProduto(dadosProduto, artesaoEntidade);
+            String imagemUrl = fileStorageService.storeFile(imagemProduto);
+
+            ProdutoCadastroDTO dadosComImagem = new ProdutoCadastroDTO(
+                    dadosProduto.nome(),
+                    dadosProduto.descricao(),
+                    dadosProduto.preco(),
+                    dadosProduto.estoque(),
+                    imagemUrl,
+                    dadosProduto.categoriaId()
+            );
+
+            Artesao artesaoEntidade = artesaoService.buscarEntidadePorId(artesaoDto.id());
+            produtoService.cadastrarProduto(dadosComImagem, artesaoEntidade);
+
             redirectAttributes.addFlashAttribute("mensagemSucesso", "Produto cadastrado com sucesso!");
             return "redirect:/artesao/dashboard";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao cadastrar o produto: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("produtoCadastroDTO", dadosProduto);
+            redirectAttributes.addFlashAttribute("categorias", categoriaService.buscarTodas()); 
             return "redirect:/artesao/produtos/novo";
         }
     }
 
-    /**
-     * Busca uma entidade Artesao pelo seu ID.
-     */
-    public Artesao buscarEntidadePorId(Long id) {
-        return artesoesEmMemoria.stream()
-                .filter(artesao -> artesao.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-    
-    // Método auxiliar para buscar por e-mail
-    private Artesao buscarPorEmail(String email) {
-        return artesoesEmMemoria.stream()
-                .filter(artesao -> artesao.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
+    @GetMapping("/produtos/editar/{id}")
+    public String exibirFormularioEdicaoProduto(@PathVariable("id") Long id, 
+                                                HttpSession session, 
+                                                Model model,
+                                                RedirectAttributes redirectAttributes) {
+        ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
+        if (artesaoLogado == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            Produto produto = produtoService.buscarEntidadePorId(id);
+            
+            if (!produto.getLoja().getArtesao().getId().equals(artesaoLogado.id())) {
+                redirectAttributes.addFlashAttribute("mensagemErro", "Você não tem permissão para editar este produto.");
+                return "redirect:/artesao/dashboard";
+            }
+
+            model.addAttribute("produtoUpdateDTO", new ProdutoUpdateDTO(produto));
+            
+            List<CategoriaDTO> categorias = categoriaService.buscarTodas(); // CORRIGIDO PARA CategoriaDTO
+            model.addAttribute("categorias", categorias);
+
+            return "editar-produto";
+        } catch (ProdutoNaoEncontradoException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Produto não encontrado.");
+            return "redirect:/artesao/dashboard";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao carregar o produto para edição: " + e.getMessage());
+            return "redirect:/artesao/dashboard";
+        }
     }
 
-    // Método auxiliar para converter para DTO
-    private ArtesaoDTO converterParaDTO(Artesao artesao) {
-        return new ArtesaoDTO(
-            artesao.getId(),
-            artesao.getNome(),
-            artesao.getEmail(),
-            artesao.getLoja().getNome(),
-            artesao.getLoja().getDescricao()
-        );
+    @PostMapping("/produtos/editar/processar")
+    public String processarEdicaoProduto(@ModelAttribute ProdutoUpdateDTO dadosUpdate, 
+                                         HttpSession session, 
+                                         RedirectAttributes redirectAttributes) {
+        ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
+        if (artesaoLogado == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            produtoService.atualizarProduto(dadosUpdate.id(), artesaoLogado.id(), dadosUpdate);
+            
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Produto atualizado com sucesso!");
+            return "redirect:/artesao/dashboard";
+        } catch (RegraDeNegocioException | ProdutoNaoEncontradoException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+            redirectAttributes.addFlashAttribute("produtoUpdateDTO", dadosUpdate);
+            redirectAttributes.addFlashAttribute("categorias", categoriaService.buscarTodas()); 
+            return "redirect:/artesao/produtos/editar/" + dadosUpdate.id();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao atualizar o produto: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("produtoUpdateDTO", dadosUpdate);
+            redirectAttributes.addFlashAttribute("categorias", categoriaService.buscarTodas()); 
+            return "redirect:/artesao/produtos/editar/" + dadosUpdate.id();
+        }
     }
 
-    
+    @PostMapping("/deletar-conta")
+    public String deletarContaArtesao(HttpSession session, RedirectAttributes redirectAttributes) {
+        ArtesaoDTO artesaoLogado = (ArtesaoDTO) session.getAttribute("usuarioLogado");
+
+        if (artesaoLogado == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            artesaoService.deletarArtesaoE_Loja(artesaoLogado.id());
+            session.invalidate(); 
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Sua conta de artesão e loja foram excluídas com sucesso.");
+            return "redirect:/";
+        } catch (RegraDeNegocioException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", e.getMessage());
+            return "redirect:/artesao/dashboard"; 
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Ocorreu um erro ao tentar excluir sua conta de artesão: " + e.getMessage());
+            e.printStackTrace(); 
+            return "redirect:/artesao/dashboard";
+        }
+    }
 }

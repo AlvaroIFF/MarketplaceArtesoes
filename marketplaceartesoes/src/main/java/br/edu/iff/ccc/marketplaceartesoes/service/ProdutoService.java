@@ -3,11 +3,14 @@ package br.edu.iff.ccc.marketplaceartesoes.service;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDetalheDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoUpdateDTO;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Artesao;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Categoria;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Loja;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Produto;
-import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontrado;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.EstoqueInsuficienteException;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontradoException;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.RegraDeNegocioException;
 import br.edu.iff.ccc.marketplaceartesoes.repository.CategoriaRepository;
 import br.edu.iff.ccc.marketplaceartesoes.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +35,6 @@ public class ProdutoService {
         this.categoriaRepository = categoriaRepository;
     }
 
-    /**
-     * Cadastra um novo produto para um artesão logado.
-     */
     @Transactional
     public void cadastrarProduto(ProdutoCadastroDTO dados, Artesao artesaoLogado) {
         Loja lojaDoArtesao = artesaoLogado.getLoja();
@@ -48,18 +48,53 @@ public class ProdutoService {
         );
         novoProduto.setImagemPrincipalUrl(dados.imagemUrl());
 
-        // Busca e associa a categoria do banco de dados
         if (dados.categoriaId() != null) {
             categoriaRepository.findById(dados.categoriaId())
-                    .ifPresent(novoProduto::adicionarCategoria); // Usando o método auxiliar
+                    .ifPresent(novoProduto::adicionarCategoria);
         }
         
         produtoRepository.save(novoProduto);
     }
 
-    /**
-     * Retorna os 3 primeiros produtos para a home page.
-     */
+    @Transactional
+    public ProdutoDTO atualizarProduto(Long produtoId, Long artesaoId, ProdutoUpdateDTO dadosUpdate) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
+
+        if (!produto.getLoja().getArtesao().getId().equals(artesaoId)) {
+            throw new RegraDeNegocioException("Você não tem permissão para editar este produto.");
+        }
+
+        produto.setNome(dadosUpdate.nome());
+        produto.setDescricao(dadosUpdate.descricao());
+        produto.setPreco(dadosUpdate.preco());
+        produto.setEstoque(dadosUpdate.estoque());
+
+        if (dadosUpdate.categoriaId() != null) {
+            Categoria novaCategoria = categoriaRepository.findById(dadosUpdate.categoriaId())
+                    .orElseThrow(() -> new RegraDeNegocioException("A categoria selecionada não foi encontrada."));
+            
+            produto.getCategorias().clear();
+            produto.adicionarCategoria(novaCategoria);
+        }
+
+        Produto produtoAtualizado = produtoRepository.save(produto);
+
+        return converterParaDTO(produtoAtualizado);
+    }
+
+    @Transactional
+    public void excluirProduto(Long produtoId, Long artesaoId) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
+
+        if (!produto.getLoja().getArtesao().getId().equals(artesaoId)) {
+            throw new RegraDeNegocioException("Você não tem permissão para remover este produto.");
+        }
+
+        produtoRepository.delete(produto);
+    }
+
     @Transactional(readOnly = true)
     public List<ProdutoDTO> listarProdutosEmDestaque() {
         return produtoRepository.findProdutosEmDestaque(PageRequest.of(0, 3)).stream()
@@ -67,48 +102,58 @@ public class ProdutoService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retorna todos os produtos, com filtro opcional por categoria.
-     */
     @Transactional(readOnly = true)
-    public List<ProdutoDTO> buscarTodos(Optional<String> categoriaSlug) {
+    public List<ProdutoDTO> buscarTodos(Optional<String> nomeCategoria) {
         List<Produto> produtos;
-        if (categoriaSlug.isPresent() && !categoriaSlug.get().isBlank()) {
-            produtos = produtoRepository.findByCategoriaNome(categoriaSlug.get());
+
+        if (nomeCategoria.isPresent() && !nomeCategoria.get().isBlank()) {
+            produtos = produtoRepository.findByCategoriaNome(nomeCategoria.get()); 
         } else {
             produtos = produtoRepository.findAll();
         }
+
         return produtos.stream()
                 .map(this::converterParaDTO)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Busca um único produto pelo ID e retorna um DTO detalhado.
-     * @throws ProdutoNaoEncontradoException se o produto não for encontrado.
-     */
     @Transactional(readOnly = true)
     public ProdutoDetalheDTO buscarPorId(Long id) {
         return produtoRepository.findById(id)
                 .map(this::converterParaDetalheDTO)
-                .orElseThrow(() -> new ProdutoNaoEncontrado(id));
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
     }
 
-    /**
-     * Busca a ENTIDADE Produto completa pelo seu ID.
-     * Usado por outros serviços que precisam da entidade, como PedidoService.
-     */
     @Transactional(readOnly = true)
     public Optional<Produto> buscarEntidadeProdutoPorId(Long id) {
         return produtoRepository.findById(id);
     }
+    
+    @Transactional(readOnly = true)
+    public Produto buscarEntidadePorId(Long produtoId) {
+        return produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
+    }
 
-    /**
-     * Busca todos os produtos de um artesão específico.
-     */
+    @Transactional
+    public void decrementarEstoque(Long produtoId, Integer quantidade) {
+        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
+
+        if (produto.getEstoque() < quantidade) {
+            throw new EstoqueInsuficienteException(produto.getNome(), produto.getEstoque());
+        }
+
+        produto.setEstoque(produto.getEstoque() - quantidade);
+        produtoRepository.save(produto);
+    }
+
     @Transactional(readOnly = true)
     public List<ProdutoDTO> buscarPorArtesaoId(Long artesaoId) {
-        return produtoRepository.findByArtesaoId(artesaoId).stream()
+        // CORRIGIDO: Agora usa o método findByArtesaoId que está anotado com @Query
+        // no ProdutoRepository e espera um Long artesaoId
+        List<Produto> produtosDoArtesao = produtoRepository.findByArtesaoId(artesaoId); 
+        
+        return produtosDoArtesao.stream()
                 .map(this::converterParaDTO)
                 .collect(Collectors.toList());
     }

@@ -4,19 +4,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -38,11 +30,12 @@ public class Loja implements Serializable {
     @Column(length = 500)
     private String descricao;
 
-    @Size(min = 14, max = 14, message = "CNPJ deve ter 14 dígitos.")
+    @Pattern(regexp = "^$|\\d{14}", message = "O CNPJ deve estar vazio ou conter exatamente 14 dígitos.")
     @Column(length = 14, unique = true)
     private String cnpj;
 
-    private String imagemBannerUrl; 
+    @Column(name = "imagem_banner_url") 
+    private String imagemBannerUrl;
 
     @Column(nullable = false)
     private LocalDate dtCriacao;
@@ -51,30 +44,25 @@ public class Loja implements Serializable {
     @JoinColumn(name = "artesao_id", nullable = false)
     private Artesao artesao;
 
-    // Relacionamento com Produto
     @OneToMany(mappedBy = "loja", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Produto> produtos = new ArrayList<>();
 
-    // Construtor vazio para o JPA
     public Loja() {
-        this.dtCriacao = LocalDate.now(); // Define a data de criação automaticamente
+        this.dtCriacao = LocalDate.now();
     }
 
     public Loja(String nome, String descricao, String cnpj, Artesao artesao) {
+        this(); 
         this.nome = nome;
         this.descricao = descricao;
         this.cnpj = cnpj;
         this.artesao = artesao;
     }
 
-
     // Getters e Setters
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNome() {
@@ -131,5 +119,18 @@ public class Loja implements Serializable {
 
     public void setProdutos(List<Produto> produtos) {
         this.produtos = produtos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Loja loja = (Loja) o;
+        return Objects.equals(id, loja.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

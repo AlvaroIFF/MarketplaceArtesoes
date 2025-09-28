@@ -1,7 +1,7 @@
 package br.edu.iff.ccc.marketplaceartesoes.entities;
 
 import java.io.Serializable;
-import java.math.BigDecimal; // Importando BigDecimal para precisão monetária
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;

@@ -7,14 +7,15 @@
 
 <main class="conteudo">
     <section class="form-container">
-        <h2>Cadastrar Novo Produto</h2>
-        <p>Preencha os dados abaixo para adicionar um novo item à sua loja.</p>
+        <h2>Editar Produto</h2>
 
-        <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
         <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
+        <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
 
-        <form th:action="@{/artesao/produtos/salvar}" th:object="${produtoCadastroDTO}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/artesao/produtos/editar/processar}" th:object="${produtoUpdateDTO}" method="post">
             
+            <input type="hidden" th:field="*{id}" />
+
             <div class="form-group">
                 <label for="nome">Nome do Produto:</label>
                 <input type="text" id="nome" th:field="*{nome}" required>
@@ -22,7 +23,7 @@
 
             <div class="form-group">
                 <label for="descricao">Descrição:</label>
-                <textarea id="descricao" th:field="*{descricao}" rows="4" required></textarea>
+                <textarea id="descricao" th:field="*{descricao}" rows="4"></textarea>
             </div>
 
             <div class="form-group">
@@ -31,21 +32,24 @@
             </div>
 
             <div class="form-group">
-                <label for="estoque">Quantidade em Estoque:</label>
+                <label for="estoque">Estoque:</label>
                 <input type="number" id="estoque" th:field="*{estoque}" min="0" required>
             </div>
 
             <div class="form-group">
-                <label for="imagemProduto">Imagem do Produto:</label>
-                <input type="file" id="imagemProduto" name="imagemProduto" class="form-control-file" accept="image/png, image/jpeg" required>
-            </div>
-
-            <div class="form-group">
-                <label for="categoriaId">Categoria:</label>
-                <input type="number" id="categoriaId" th:field="*{categoriaId}" placeholder="ID da Categoria">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" th:field="*{categoriaId}" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option th:each="cat : ${categorias}" 
+                            th:value="${cat.id}" 
+                            th:text="${cat.nome}">
+                        Nome da Categoria
+                    </option>
+                </select>
             </div>
             
-            <button type="submit" class="btn-primary">Salvar Produto</button>
+            <button type="submit" class="btn-primary">Salvar Alterações</button>
+            <a th:href="@{/artesao/dashboard}" class="btn-secondary">Cancelar</a>
         </form>
     </section>
 </main>

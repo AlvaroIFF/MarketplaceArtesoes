@@ -8,7 +8,22 @@
 <main class="conteudo">
     <section class="product-listing">
         <h2>Nossos Produtos</h2>
-        
+
+        <div class="filtros-categorias">
+            <span style="font-weight: bold; margin-right: 10px;">Filtrar por:</span>
+    
+                <a th:href="@{/produtos}" 
+                    th:classappend="${categoriaSelecionada == null} ? 'filtro-ativo' : ''"
+                    class="filtro-link">Todos</a>
+    
+                <a th:each="cat : ${categorias}" 
+                    th:href="@{/produtos(categoria=${cat.nome})}" 
+                    th:text="${cat.nome}"
+                    th:classappend="${#strings.equalsIgnoreCase(categoriaSelecionada, cat.nome)} ? 'filtro-ativo' : ''"
+                    class="filtro-link">
+                    Nome da Categoria
+                </a>
+        </div>
         <div class="product-grid">
             <div class="product-card" th:each="produto : ${produtos}">
                 <a th:href="@{/produtos/{id}(id=${produto.id})}">

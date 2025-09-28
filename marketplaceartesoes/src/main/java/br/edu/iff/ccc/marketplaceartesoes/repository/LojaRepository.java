@@ -12,4 +12,6 @@ public interface LojaRepository extends JpaRepository<Loja, Long> {
     Optional<Loja> findByCnpj(String cnpj);
     Optional<Loja> findByNome(String nome);
     Optional<Loja> findByArtesaoId(Long artesaoId);
+    Optional<Loja> findByCnpjAndIdNot(String cnpj, Long id);
+    Optional<Loja> findByNomeAndIdNot(String nome, Long id);
 }

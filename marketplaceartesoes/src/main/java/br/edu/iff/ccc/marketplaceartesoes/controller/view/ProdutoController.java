@@ -2,8 +2,9 @@ package br.edu.iff.ccc.marketplaceartesoes.controller.view;
 
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDetalheDTO;
-import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontrado;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontradoException;
 import br.edu.iff.ccc.marketplaceartesoes.service.CarrinhoService;
+import br.edu.iff.ccc.marketplaceartesoes.service.CategoriaService; // <-- Adicione este import
 import br.edu.iff.ccc.marketplaceartesoes.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,24 +24,33 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
     private final CarrinhoService carrinhoService;
+    private final CategoriaService categoriaService; // <-- Adicione esta declaração
 
     @Autowired
-    public ProdutoController(ProdutoService produtoService, CarrinhoService carrinhoService) {
+    public ProdutoController(ProdutoService produtoService, CarrinhoService carrinhoService, CategoriaService categoriaService) { // <-- Adicione categoriaService aqui
         this.produtoService = produtoService;
         this.carrinhoService = carrinhoService;
+        this.categoriaService = categoriaService; // <-- Atribua aqui
     }
 
     @GetMapping
-    public String listarProdutos(@RequestParam Optional<String> categoria, Model model) {
-        // 1. Chama o serviço para buscar os produtos, passando o filtro de categoria se existir
-        List<ProdutoDTO> produtos = produtoService.buscarTodos(categoria);
-        
-        // 2. Adiciona a lista ao model para o Thymeleaf usar
+    public String listarProdutos(@RequestParam(required = false) String categoria, Model model) {
+        // 1. Busca os produtos, passando o filtro de categoria
+        List<ProdutoDTO> produtos = produtoService.buscarTodos(Optional.ofNullable(categoria));
+    
+        // 2. Busca todas as categorias para os links de filtro
+        model.addAttribute("categorias", categoriaService.buscarTodas());
+    
+        // 3. Adiciona os produtos ao modelo
         model.addAttribute("produtos", produtos);
-        
-        // 3. Retorna o nome do arquivo HTML da página de produtos
+    
+        // 4. ADICIONE ESTA LINHA: Adiciona a categoria ATUALMENTE selecionada ao modelo
+        model.addAttribute("categoriaSelecionada", categoria);
+    
+        // 5. Retorna o nome do arquivo HTML
         return "produtos";
     }
+
 
     @GetMapping("/{id}")
     public String detalheProduto(@PathVariable("id") Long id, Model model) {
@@ -49,7 +59,7 @@ public class ProdutoController {
 
             model.addAttribute("produto", produto);
             return "detalhe-produto";
-        } catch (ProdutoNaoEncontrado e) {
+        } catch (ProdutoNaoEncontradoException e) {
             System.err.println("Erro: " + e.getMessage());
             return "redirect:/produtos"; // Redireciona para a lista de produtos
         }
@@ -59,7 +69,7 @@ public class ProdutoController {
     public String adicionarAoCarrinho(@PathVariable("id") Long id, @RequestParam("quantidade") int quantidade) {
         try {
             carrinhoService.adicionarItem(id, quantidade);
-        } catch (ProdutoNaoEncontrado e) {
+        } catch (ProdutoNaoEncontradoException e) {
             System.err.println("Tentativa de adicionar produto inexistente ao carrinho. ID: " + id);
             return "redirect:/produtos";
         }

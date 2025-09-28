@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class ProdutoNaoEncontrado extends RuntimeException {
+public class ProdutoNaoEncontradoException extends RuntimeException {
 
-    public ProdutoNaoEncontrado(String message) {
+    public ProdutoNaoEncontradoException(String message) {
         super(message);
     }
 
-    public ProdutoNaoEncontrado(Long id) {
+    public ProdutoNaoEncontradoException(Long id) {
         super("Produto com o ID '" + id + "' não encontrado.");
     }
 }

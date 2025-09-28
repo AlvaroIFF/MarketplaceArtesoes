@@ -3,7 +3,7 @@ package br.edu.iff.ccc.marketplaceartesoes.service;
 import br.edu.iff.ccc.marketplaceartesoes.dto.CarrinhoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ItemCarrinhoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.entities.Produto; 
-import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontrado;
+import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
@@ -40,7 +40,7 @@ public class CarrinhoService {
 
         // 1. Buscar o produto do banco de dados para obter as informações mais recentes
         Produto produtoEntidade = produtoService.buscarEntidadeProdutoPorId(produtoId)
-                                                .orElseThrow(() -> new ProdutoNaoEncontrado(produtoId));
+                                                .orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
 
         // 2. Tentar encontrar o item no carrinho
         ItemCarrinhoDTO itemExistente = itensMap.get(produtoId);
@@ -89,7 +89,7 @@ public class CarrinhoService {
         if (itemExistente != null) {
             // Garante que pegamos os dados mais recentes do produto, especialmente o preço.
             Produto produtoEntidade = produtoService.buscarEntidadeProdutoPorId(produtoId)
-                                                    .orElseThrow(() -> new ProdutoNaoEncontrado(produtoId));
+                                                    .orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
 
             itensMap.put(produtoId, new ItemCarrinhoDTO(
                 produtoEntidade.getId(),
