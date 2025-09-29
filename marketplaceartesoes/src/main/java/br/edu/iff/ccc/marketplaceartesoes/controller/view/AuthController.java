@@ -41,6 +41,7 @@ public class AuthController {
             // Tenta fazer login como Cliente
             ClienteDTO clienteLogado = clienteService.fazerLogin(email, senha);
             session.setAttribute("usuarioLogado", clienteLogado);
+            session.setAttribute("usuarioLogadoId", clienteLogado.id());
             session.setAttribute("tipoUsuario", "CLIENTE");
             return "redirect:/clientes/area-cliente";
 

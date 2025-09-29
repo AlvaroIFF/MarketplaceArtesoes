@@ -42,7 +42,13 @@
 
             <div class="form-group">
                 <label for="categoriaId">Categoria:</label>
-                <input type="number" id="categoriaId" th:field="*{categoriaId}" placeholder="ID da Categoria">
+                <select id="categoriaId" th:field="*{categoriaId}" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option th:each="cat : ${todasCategorias}"
+                            th:value="${cat.id}"
+                            th:text="${cat.nome}">
+                    </option>
+                </select>
             </div>
             
             <button type="submit" class="btn-primary">Salvar Produto</button>

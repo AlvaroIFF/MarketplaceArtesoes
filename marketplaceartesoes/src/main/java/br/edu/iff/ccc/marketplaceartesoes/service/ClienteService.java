@@ -1,5 +1,8 @@
 package br.edu.iff.ccc.marketplaceartesoes.service;
 
+import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteApiCadastroDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteApiDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteApiUpdateDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ClienteUpdateDTO; // <-- Import the new DTO
@@ -8,7 +11,11 @@ import br.edu.iff.ccc.marketplaceartesoes.exceptions.AutenticacaoException;
 import br.edu.iff.ccc.marketplaceartesoes.exceptions.ClienteNaoEncontradoException;
 import br.edu.iff.ccc.marketplaceartesoes.exceptions.RegraDeNegocioException;
 import br.edu.iff.ccc.marketplaceartesoes.repository.ClienteRepository;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,157 +25,232 @@ import br.edu.iff.ccc.marketplaceartesoes.repository.PedidoRepository;
 @Service
 public class ClienteService {
 
-  private final ClienteRepository clienteRepository;
-  private final FileStorageService fileStorageService;
-  private final PedidoRepository pedidoRepository;
+    private final ClienteRepository clienteRepository;
+    private final FileStorageService fileStorageService;
+    private final PedidoRepository pedidoRepository;
 
-  @Autowired
-  public ClienteService(
-    ClienteRepository clienteRepository,
-    FileStorageService fileStorageService,
-    PedidoRepository pedidoRepository
-  ) {
-    this.clienteRepository = clienteRepository;
-    this.fileStorageService = fileStorageService;
-    this.pedidoRepository = pedidoRepository;
-  }
-
-  @Transactional
-  public void cadastrarCliente(
-    ClienteCadastroDTO dadosCadastro,
-    MultipartFile foto
-  ) {
-    if (!dadosCadastro.senha().equals(dadosCadastro.confirmarSenha())) {
-      throw new RegraDeNegocioException("As senhas não conferem!");
-    }
-
-    if (clienteRepository.findByEmail(dadosCadastro.email()).isPresent()) {
-      throw new RegraDeNegocioException("Este e-mail já está em uso.");
-    }
-
-    if (
-      dadosCadastro.cpf() != null &&
-      !dadosCadastro.cpf().isBlank() &&
-      clienteRepository.findByCpf(dadosCadastro.cpf()).isPresent()
+    @Autowired
+    public ClienteService(
+      ClienteRepository clienteRepository,
+      FileStorageService fileStorageService,
+      PedidoRepository pedidoRepository
     ) {
-      throw new RegraDeNegocioException("Este CPF já está em uso.");
+      this.clienteRepository = clienteRepository;
+      this.fileStorageService = fileStorageService;
+      this.pedidoRepository = pedidoRepository;
     }
 
-    String fotoUrl = fileStorageService.salvarImagem(foto);
-
-    Cliente novoCliente = new Cliente(
-      dadosCadastro.nome(),
-      dadosCadastro.cpf(),
-      dadosCadastro.dtNasc(),
-      dadosCadastro.numContato(),
-      dadosCadastro.email(),
-      dadosCadastro.senha(),
-      fotoUrl
-    );
-
-    clienteRepository.save(novoCliente);
-    System.out.println(
-      "Cliente cadastrado com sucesso: " +
-      novoCliente.getNome() +
-      " (ID: " +
-      novoCliente.getId() +
-      ")"
-    );
-  }
-
-  /**
-   * Atualiza os dados de um cliente existente.
-   * @param id O ID do cliente a ser atualizado.
-   * @param dadosUpdate DTO com as novas informações.
-   */
-  @Transactional
-  public ClienteDTO atualizarCliente(Long id, ClienteUpdateDTO dadosUpdate) {
-    // 1. Busca o cliente no banco de dados
-    Cliente cliente = clienteRepository
-      .findById(id)
-      .orElseThrow(() -> new ClienteNaoEncontradoException(id));
-
-    // 2. Valida se o novo E-MAIL já não está em uso por OUTRO cliente
-    Optional<Cliente> clienteComNovoEmail = clienteRepository.findByEmail(
-      dadosUpdate.email()
-    );
-    if (
-      clienteComNovoEmail.isPresent() &&
-      !clienteComNovoEmail.get().getId().equals(cliente.getId())
+    @Transactional
+    public void cadastrarCliente(
+      ClienteCadastroDTO dadosCadastro,
+      MultipartFile foto
     ) {
-      throw new RegraDeNegocioException(
-        "O e-mail informado já está em uso por outro cliente."
+      if (!dadosCadastro.senha().equals(dadosCadastro.confirmarSenha())) {
+        throw new RegraDeNegocioException("As senhas não conferem!");
+      }
+
+      if (clienteRepository.findByEmail(dadosCadastro.email()).isPresent()) {
+        throw new RegraDeNegocioException("Este e-mail já está em uso.");
+      }
+
+      if (
+        dadosCadastro.cpf() != null &&
+        !dadosCadastro.cpf().isBlank() &&
+        clienteRepository.findByCpf(dadosCadastro.cpf()).isPresent()
+      ) {
+        throw new RegraDeNegocioException("Este CPF já está em uso.");
+      }
+
+      String fotoUrl = fileStorageService.salvarImagem(foto);
+
+      Cliente novoCliente = new Cliente(
+        dadosCadastro.nome(),
+        dadosCadastro.cpf(),
+        dadosCadastro.dtNasc(),
+        dadosCadastro.numContato(),
+        dadosCadastro.email(),
+        dadosCadastro.senha(),
+        fotoUrl
+      );
+
+      clienteRepository.save(novoCliente);
+      System.out.println(
+        "Cliente cadastrado com sucesso: " +
+        novoCliente.getNome() +
+        " (ID: " +
+        novoCliente.getId() +
+        ")"
       );
     }
 
-    // 3. Valida se o novo CPF já não está em uso por OUTRO cliente
-    Optional<Cliente> clienteComNovoCpf = clienteRepository.findByCpf(
-      dadosUpdate.cpf()
-    );
-    if (
-      clienteComNovoCpf.isPresent() &&
-      !clienteComNovoCpf.get().getId().equals(cliente.getId())
-    ) {
-      throw new RegraDeNegocioException(
-        "O CPF informado já está em uso por outro cliente."
+    /**
+     * Atualiza os dados de um cliente existente.
+     * @param id O ID do cliente a ser atualizado.
+     * @param dadosUpdate DTO com as novas informações.
+     */
+    @Transactional
+    public ClienteDTO atualizarCliente(Long id, ClienteUpdateDTO dadosUpdate) {
+      // 1. Busca o cliente no banco de dados
+      Cliente cliente = clienteRepository
+        .findById(id)
+        .orElseThrow(() -> new ClienteNaoEncontradoException(id));
+
+      // 2. Valida se o novo E-MAIL já não está em uso por OUTRO cliente
+      Optional<Cliente> clienteComNovoEmail = clienteRepository.findByEmail(
+        dadosUpdate.email()
       );
+      if (
+        clienteComNovoEmail.isPresent() &&
+        !clienteComNovoEmail.get().getId().equals(cliente.getId())
+      ) {
+        throw new RegraDeNegocioException(
+          "O e-mail informado já está em uso por outro cliente."
+        );
+      }
+
+      // 3. Valida se o novo CPF já não está em uso por OUTRO cliente
+      Optional<Cliente> clienteComNovoCpf = clienteRepository.findByCpf(
+        dadosUpdate.cpf()
+      );
+      if (
+        clienteComNovoCpf.isPresent() &&
+        !clienteComNovoCpf.get().getId().equals(cliente.getId())
+      ) {
+        throw new RegraDeNegocioException(
+          "O CPF informado já está em uso por outro cliente."
+        );
+      }
+
+      // 4. Atualiza os dados da entidade com os dados do DTO
+      cliente.setNome(dadosUpdate.nome());
+      cliente.setEmail(dadosUpdate.email());
+      cliente.setCpf(dadosUpdate.cpf());
+      cliente.setDtNasc(dadosUpdate.dtNasc());
+      cliente.setNumContato(dadosUpdate.numContato());
+
+      // 5. Salva a entidade atualizada
+      Cliente clienteAtualizado = clienteRepository.save(cliente);
+
+      // 6. Retorna um DTO com os dados atualizados
+      return converterParaDTO(clienteAtualizado);
     }
 
-    // 4. Atualiza os dados da entidade com os dados do DTO
-    cliente.setNome(dadosUpdate.nome());
-    cliente.setEmail(dadosUpdate.email());
-    cliente.setCpf(dadosUpdate.cpf());
-    cliente.setDtNasc(dadosUpdate.dtNasc());
-    cliente.setNumContato(dadosUpdate.numContato());
+    @Transactional
+      public void deletarCliente(Long id) {
+          Cliente cliente = clienteRepository.findById(id)
+                  .orElseThrow(() -> new ClienteNaoEncontradoException(id));
 
-    // 5. Salva a entidade atualizada
-    Cliente clienteAtualizado = clienteRepository.save(cliente);
+          if (!pedidoRepository.findByClienteId(id).isEmpty()) {
+              throw new RegraDeNegocioException("Não é possível excluir o cliente, pois ele possui pedidos registrados.");
+          }
+          
+          clienteRepository.delete(cliente);
+      }
 
-    // 6. Retorna um DTO com os dados atualizados
-    return converterParaDTO(clienteAtualizado);
-  }
+    @Transactional(readOnly = true)
+    public ClienteDTO fazerLogin(String email, String senha) {
+      Cliente cliente = clienteRepository
+        .findByEmail(email)
+        .orElseThrow(() -> new AutenticacaoException("E-mail ou senha inválidos."));
 
-  @Transactional
-    public void deletarCliente(Long id) {
-        Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new ClienteNaoEncontradoException(id));
+      if (!cliente.getSenha().equals(senha)) {
+        throw new AutenticacaoException("E-mail ou senha inválidos.");
+      }
 
-        if (!pedidoRepository.findByClienteId(id).isEmpty()) {
-            throw new RegraDeNegocioException("Não é possível excluir o cliente, pois ele possui pedidos registrados.");
+      return converterParaDTO(cliente);
+    }
+
+    @Transactional(readOnly = true)
+    public Cliente buscarEntidadePorId(Long id) {
+      return clienteRepository
+        .findById(id)
+        .orElseThrow(() -> new ClienteNaoEncontradoException(id));
+    }
+
+    private ClienteDTO converterParaDTO(Cliente cliente) {
+      return new ClienteDTO(
+        cliente.getId(),
+        cliente.getNome(),
+        cliente.getCpf(),
+        cliente.getDtNasc(),
+        cliente.getNumContato(),
+        cliente.getEmail(),
+        cliente.getFotoUrl()
+      );
+    }
+    @Transactional
+    public ClienteApiDTO cadastrarClienteApi(ClienteApiCadastroDTO dto) {
+        // Validações agora usam o novo repositório
+        if (clienteRepository.existsByEmail(dto.email())) {
+            throw new RegraDeNegocioException("O e-mail informado já está em uso.");
         }
-        
-        clienteRepository.delete(cliente);
-    }
+        if (clienteRepository.existsByCpf(dto.cpf())) {
+            throw new RegraDeNegocioException("O CPF informado já está em uso.");
+        }
 
-  @Transactional(readOnly = true)
-  public ClienteDTO fazerLogin(String email, String senha) {
-    Cliente cliente = clienteRepository
-      .findByEmail(email)
-      .orElseThrow(() -> new AutenticacaoException("E-mail ou senha inválidos."));
+        Cliente novoCliente = new Cliente(
+                dto.nome(),
+                dto.cpf(),
+                dto.dtNasc(),
+                dto.numContato(),
+                dto.email(),
+                dto.senha() 
+          );
 
-    if (!cliente.getSenha().equals(senha)) {
-      throw new AutenticacaoException("E-mail ou senha inválidos.");
-    }
+        // Salva o cliente usando o repositório específico de cliente
+        Cliente clienteSalvo = clienteRepository.save(novoCliente);
 
-    return converterParaDTO(cliente);
+        return new ClienteApiDTO(clienteSalvo);
+      }
+
+      @Transactional(readOnly = true)
+  public ClienteApiDTO buscarClientePorId(Long id) {
+      Cliente cliente = clienteRepository.findById(id)
+          .orElseThrow(() -> new RegraDeNegocioException("Cliente não encontrado com o ID: " + id));
+      return new ClienteApiDTO(cliente);
   }
 
-  @Transactional(readOnly = true)
-  public Cliente buscarEntidadePorId(Long id) {
-    return clienteRepository
-      .findById(id)
-      .orElseThrow(() -> new ClienteNaoEncontradoException(id));
+  @Transactional
+  public ClienteApiDTO atualizarCliente(Long id, ClienteApiUpdateDTO dto) {
+      Cliente cliente = clienteRepository.findById(id)
+          .orElseThrow(() -> new RegraDeNegocioException("Cliente não encontrado com o ID: " + id));
+
+      // Valida se o novo e-mail já está em uso por OUTRO usuário
+      clienteRepository.findByEmail(dto.email()).ifPresent(outroCliente -> {
+          if (!outroCliente.getId().equals(id)) {
+              throw new RegraDeNegocioException("O e-mail informado já está em uso por outro cliente.");
+          }
+      });
+
+      cliente.setNome(dto.nome());
+      cliente.setDtNasc(dto.dtNasc());
+      cliente.setNumContato(dto.numContato());
+      cliente.setEmail(dto.email());
+
+      Cliente clienteAtualizado = clienteRepository.save(cliente);
+      return new ClienteApiDTO(clienteAtualizado);
   }
 
-  private ClienteDTO converterParaDTO(Cliente cliente) {
+    // Para o GET de listar todos (endpoint de admin)
+    @Transactional(readOnly = true)
+    public List<ClienteApiDTO> buscarTodosClientes() {
+        return clienteRepository.findAll().stream()
+                .map(ClienteApiDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public ClienteDTO buscarClienteDTOPorId(Long clienteId) {
+    Cliente cliente = clienteRepository.findById(clienteId)
+        .orElseThrow(() -> new RegraDeNegocioException("Cliente não encontrado"));
+
     return new ClienteDTO(
-      cliente.getId(),
-      cliente.getNome(),
-      cliente.getCpf(),
-      cliente.getDtNasc(),
-      cliente.getNumContato(),
-      cliente.getEmail(),
-      cliente.getFotoUrl()
+        cliente.getId(),
+        cliente.getNome(),
+        cliente.getCpf(),
+        cliente.getDtNasc(),
+        cliente.getNumContato(),
+        cliente.getEmail(),
+        cliente.getFotoUrl()
     );
-  }
+}
 }

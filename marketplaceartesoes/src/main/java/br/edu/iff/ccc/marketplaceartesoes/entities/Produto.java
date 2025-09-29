@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,6 +62,7 @@ public class Produto implements Serializable {
     // Relacionamento com Loja (Muitos Produtos para Uma Loja)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loja_id", nullable = false)
+    @JsonIgnore
     private Loja loja;
 
     // Relacionamento com Categoria (Muitos Produtos para Muitas Categorias)

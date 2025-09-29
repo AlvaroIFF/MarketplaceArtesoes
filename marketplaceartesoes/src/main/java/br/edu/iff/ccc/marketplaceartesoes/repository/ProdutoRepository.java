@@ -24,5 +24,8 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     List<Produto> findByLoja(Loja loja); 
 
-    List<Produto> findByLojaId(Long lojaId); 
+    List<Produto> findByLojaId(Long lojaId);
+
+    @Query("SELECT p FROM Produto p JOIN p.categorias c WHERE c.id = :categoriaId")
+    List<Produto> findByCategoriaId(@Param("categoriaId") Long categoriaId); 
 }

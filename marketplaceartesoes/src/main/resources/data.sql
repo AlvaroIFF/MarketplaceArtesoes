@@ -19,10 +19,10 @@ INSERT INTO usuarios (tipo_usuario, nome, cpf, dt_nasc, num_contato, email, senh
 VALUES ('ARTESAO', 'Ana Pereira', '33333333333', '1997-09-01', '81977777773', 'ana@email.com', 'senha123', '/images/ana-pereira.png');
 
 INSERT INTO usuarios (tipo_usuario, nome, cpf, dt_nasc, num_contato, email, senha, foto_url) 
-VALUES ('ARTESAO', 'José Oliveira', '44444444444', '1970-06-13', '22999871777', 'jose@email.com', 'senha123', null);
+VALUES ('ARTESAO', 'José Oliveira', '44444444444', '1970-06-13', '22999871777', 'jose@email.com', 'senha123', '/images/jose-oliveira.png');
 
 INSERT INTO usuarios (tipo_usuario, nome, cpf, dt_nasc, num_contato, email, senha, foto_url) 
-VALUES ('CLIENTE', 'Carlos Souza', '55555555555', '1990-05-15', '31999999994', 'carlos@email.com', 'clientesenha', null);
+VALUES ('CLIENTE', 'Carlos Souza', '55555555555', '1990-05-15', '31999999994', 'carlos@email.com', 'senha123', '/images/carlos-souza.png');
 
 -- =========================
 -- Inserindo Lojas
@@ -37,7 +37,7 @@ INSERT INTO lojas (nome, descricao, cnpj, artesao_id, imagem_banner_url, dt_cria
 VALUES ('Prata da Casa', 'Jóias artesanais em prata', null, 3, '/images/ana-banner.png', CURRENT_DATE);
 
 INSERT INTO lojas (nome, descricao, cnpj, artesao_id, imagem_banner_url, dt_criacao) 
-VALUES ('Ateliê do José', 'Móveis e decoração em madeira', null, 4, null, CURRENT_DATE);
+VALUES ('Ateliê do José', 'Móveis e decoração em madeira', null, 4, '/images/jose-banner.png', CURRENT_DATE);
 
 -- =========================
 -- Inserindo Produtos

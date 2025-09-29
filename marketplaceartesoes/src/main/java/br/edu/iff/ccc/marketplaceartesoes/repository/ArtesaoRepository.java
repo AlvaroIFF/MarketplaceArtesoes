@@ -17,4 +17,7 @@ public interface ArtesaoRepository extends JpaRepository<Artesao, Long> {
 
     Optional<Artesao> findByCpfAndIdNot(String cpf, Long id);
 
+    boolean existsByEmail(String email);
+    boolean existsByCpf(String cpf);
+
 }

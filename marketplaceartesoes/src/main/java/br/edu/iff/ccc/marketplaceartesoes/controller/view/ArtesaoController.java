@@ -141,17 +141,20 @@ public class ArtesaoController {
         }
     }
 
-    // --- Métodos de Cadastro de Produto ---
     @GetMapping("/produtos/novo")
     public String exibirFormularioProduto(HttpSession session, Model model) {
+        // Verifica se o usuário está logado e é artesão
         if (session.getAttribute("usuarioLogado") == null || !"ARTESAO".equals(session.getAttribute("tipoUsuario"))) {
             return "redirect:/auth/login";
         }
+
+        // Cria DTO vazio para o formulário
         model.addAttribute("produtoCadastroDTO", new ProdutoCadastroDTO("", "", null, 0, "", null));
-        
-        List<CategoriaDTO> categorias = categoriaService.buscarTodas(); // CORRIGIDO PARA CategoriaDTO
-        model.addAttribute("categorias", categorias); 
-        
+
+        // Busca categorias e adiciona no Model com o nome que o template espera
+        List<CategoriaDTO> todasCategorias = categoriaService.buscarTodas();
+        model.addAttribute("todasCategorias", todasCategorias);
+
         return "form-produto";
     }
 

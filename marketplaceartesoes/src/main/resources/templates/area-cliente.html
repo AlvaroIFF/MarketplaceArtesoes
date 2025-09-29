@@ -33,9 +33,11 @@
 
             <div class="order-history">
                 <h3>Histórico de Pedidos</h3>
+
                 <div th:if="${pedidos.isEmpty()}" class="empty-history">
                     <p>Você ainda não fez nenhum pedido.</p>
                 </div>
+
                 <table th:if="${!pedidos.isEmpty()}" class="order-table">
                     <thead>
                         <tr>
@@ -46,8 +48,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="pedido : ${pedidos}">
-                            <td data-label="Pedido Nº" th:text="${'#' + pedido.id}">#00001</td>
+                        <tr th:each="pedido : ${pedidos}" 
+                            th:onclick="'window.location.href=\'/pedidos/' + ${pedido.id} + '\';'" 
+                            style="cursor: pointer;">
+                            <td data-label="Pedido Nº" th:text="'#' + ${pedido.id}">#00001</td>
                             <td data-label="Data" th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">Data</td>
                             <td data-label="Valor" th:text="${#numbers.formatCurrency(pedido.valorTotal)}">R$ 0,00</td>
                             <td data-label="Status"><span class="status-tag" th:text="${pedido.status}">Status</span></td>

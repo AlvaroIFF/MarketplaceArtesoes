@@ -27,19 +27,19 @@ public class Cliente extends Usuario {
         super();
     }
 
-    // Construtor principal ATUALIZADO
+    // Construtor principal
     public Cliente(String nome, String cpf, LocalDate dtNasc, String numContato, String email, String senha, String fotoUrl) {
-        // 1. Chama o construtor da superclasse para inicializar os dados de Usuario
         super(nome, cpf, dtNasc, numContato, email, senha, fotoUrl);
         
-        // 2. Cria um novo Carrinho
         Carrinho novoCarrinho = new Carrinho();
         
-        // 3. Estabelece a relação bidirecional: avisa ao carrinho quem é o cliente dele
         novoCarrinho.setCliente(this);
         
-        // 4. Atribui o carrinho recém-criado a este cliente
         this.carrinho = novoCarrinho;
+    }
+
+    public Cliente(String nome, String cpf, LocalDate dtNasc, String numContato, String email, String senha) {
+        super(nome, cpf, dtNasc, numContato, email, senha, null);
     }
 
     // Getters e Setters continuam os mesmos...

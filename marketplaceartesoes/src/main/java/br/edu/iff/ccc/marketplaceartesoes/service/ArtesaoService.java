@@ -1,5 +1,8 @@
 package br.edu.iff.ccc.marketplaceartesoes.service;
 
+import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoApiCadastroDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoApiDTO;
+import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoApiUpdateDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ArtesaoUpdateDTO; 
@@ -20,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ArtesaoService {
@@ -187,5 +191,95 @@ public class ArtesaoService {
 
     private ArtesaoDTO converterParaDTO(Artesao artesao) {
         return new ArtesaoDTO(artesao);
+    }
+
+    @Transactional
+    public ArtesaoApiDTO cadastrarArtesaoApi(ArtesaoApiCadastroDTO dto) {
+        // Validações de dados únicos
+        if (artesaoRepository.existsByEmail(dto.email())) {
+            throw new RegraDeNegocioException("O e-mail informado já está em uso.");
+        }
+        if (artesaoRepository.existsByCpf(dto.cpf())) {
+            throw new RegraDeNegocioException("O CPF informado já está em uso.");
+        }
+        // Você também pode adicionar uma validação para o CNPJ e nome da loja se forem únicos
+
+        // Cria a entidade Artesao
+        Artesao novoArtesao = new Artesao(
+            dto.nome(),
+            dto.cpf(),
+            dto.dtNasc(),
+            dto.numContato(),
+            dto.email(),
+            dto.senha(), // Lembre-se da criptografia para a P2!
+            null // fotoUrl inicia como nula na API
+        );
+
+        // Cria a entidade Loja e associa ao artesão
+        Loja novaLoja = new Loja(
+            dto.nomeLoja(),
+            dto.descricaoLoja(),
+            dto.cnpj(),
+            novoArtesao
+        );
+
+        // Define a relação bidirecional
+        novoArtesao.setLoja(novaLoja);
+
+        // Salva o artesão (e a loja será salva em cascata)
+        Artesao artesaoSalvo = artesaoRepository.save(novoArtesao);
+
+        return new ArtesaoApiDTO(artesaoSalvo);
+    }
+
+    @Transactional(readOnly = true)
+    public ArtesaoApiDTO buscarArtesaoPorId(Long id) {
+        Artesao artesao = artesaoRepository.findById(id)
+          .orElseThrow(() -> new RegraDeNegocioException("Artesão não encontrado com o ID: " + id));
+        return new ArtesaoApiDTO(artesao);
+    }
+
+    @Transactional
+    public ArtesaoApiDTO atualizarArtesao(Long id, ArtesaoApiUpdateDTO dto) {
+        Artesao artesao = artesaoRepository.findById(id)
+            .orElseThrow(() -> new RegraDeNegocioException("Artesão não encontrado com o ID: " + id));
+
+        artesaoRepository.findByEmail(dto.email()).ifPresent(outroArtesao -> {
+            if (!outroArtesao.getId().equals(id)) {
+                throw new RegraDeNegocioException("O e-mail informado já está em uso por outro usuário.");
+            }
+        });
+
+        // Atualiza dados do artesão
+        artesao.setNome(dto.nome());
+        artesao.setDtNasc(dto.dtNasc());
+        artesao.setNumContato(dto.numContato());
+        artesao.setEmail(dto.email());
+
+        // Atualiza dados da loja
+        Loja loja = artesao.getLoja();
+        if (loja != null) {
+            loja.setNome(dto.nomeLoja());
+            loja.setDescricao(dto.descricaoLoja());
+            loja.setCnpj(dto.cnpj());
+        }
+
+        Artesao artesaoAtualizado = artesaoRepository.save(artesao);
+        return new ArtesaoApiDTO(artesaoAtualizado);
+    }
+
+    @Transactional
+    public void deletarArtesao(Long id) {
+        if (!artesaoRepository.existsById(id)) {
+            throw new RegraDeNegocioException("Artesão não encontrado com o ID: " + id);
+        }
+        artesaoRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArtesaoApiDTO> buscarTodosArtesaos() {
+        return artesaoRepository.findAll().stream()
+                .map(ArtesaoApiDTO::new)
+                .collect(Collectors.toList());
     }
 }

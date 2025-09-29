@@ -19,35 +19,30 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/produtos") // Todas as URLs deste controller começarão com /produtos
+@RequestMapping("/produtos") 
 public class ProdutoController {
 
     private final ProdutoService produtoService;
     private final CarrinhoService carrinhoService;
-    private final CategoriaService categoriaService; // <-- Adicione esta declaração
+    private final CategoriaService categoriaService; 
 
     @Autowired
     public ProdutoController(ProdutoService produtoService, CarrinhoService carrinhoService, CategoriaService categoriaService) { // <-- Adicione categoriaService aqui
         this.produtoService = produtoService;
         this.carrinhoService = carrinhoService;
-        this.categoriaService = categoriaService; // <-- Atribua aqui
+        this.categoriaService = categoriaService; 
     }
 
     @GetMapping
     public String listarProdutos(@RequestParam(required = false) String categoria, Model model) {
-        // 1. Busca os produtos, passando o filtro de categoria
         List<ProdutoDTO> produtos = produtoService.buscarTodos(Optional.ofNullable(categoria));
     
-        // 2. Busca todas as categorias para os links de filtro
         model.addAttribute("categorias", categoriaService.buscarTodas());
     
-        // 3. Adiciona os produtos ao modelo
         model.addAttribute("produtos", produtos);
     
-        // 4. ADICIONE ESTA LINHA: Adiciona a categoria ATUALMENTE selecionada ao modelo
         model.addAttribute("categoriaSelecionada", categoria);
     
-        // 5. Retorna o nome do arquivo HTML
         return "produtos";
     }
 
@@ -75,4 +70,5 @@ public class ProdutoController {
         }
         return "redirect:/carrinho";
     }
+
 }

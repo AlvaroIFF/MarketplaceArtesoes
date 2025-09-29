@@ -1,5 +1,6 @@
 package br.edu.iff.ccc.marketplaceartesoes.service;
 
+import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoApiDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoCadastroDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDTO;
 import br.edu.iff.ccc.marketplaceartesoes.dto.ProdutoDetalheDTO;
@@ -12,6 +13,7 @@ import br.edu.iff.ccc.marketplaceartesoes.exceptions.EstoqueInsuficienteExceptio
 import br.edu.iff.ccc.marketplaceartesoes.exceptions.ProdutoNaoEncontradoException;
 import br.edu.iff.ccc.marketplaceartesoes.exceptions.RegraDeNegocioException;
 import br.edu.iff.ccc.marketplaceartesoes.repository.CategoriaRepository;
+import br.edu.iff.ccc.marketplaceartesoes.repository.LojaRepository;
 import br.edu.iff.ccc.marketplaceartesoes.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -28,11 +30,14 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final LojaRepository lojaRepository;
+
 
     @Autowired
-    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository) {
+    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository, LojaRepository lojaRepository) {
         this.produtoRepository = produtoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.lojaRepository = lojaRepository;
     }
 
     @Transactional
@@ -147,10 +152,15 @@ public class ProdutoService {
         produtoRepository.save(produto);
     }
 
+    @Transactional
+    public void incrementarEstoque(Long produtoId, Integer quantidade) {
+        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
+        produto.setEstoque(produto.getEstoque() + quantidade);
+        produtoRepository.save(produto);
+    }
+
     @Transactional(readOnly = true)
     public List<ProdutoDTO> buscarPorArtesaoId(Long artesaoId) {
-        // CORRIGIDO: Agora usa o método findByArtesaoId que está anotado com @Query
-        // no ProdutoRepository e espera um Long artesaoId
         List<Produto> produtosDoArtesao = produtoRepository.findByArtesaoId(artesaoId); 
         
         return produtosDoArtesao.stream()
@@ -195,5 +205,75 @@ public class ProdutoService {
             nomeArtesao,
             nomesCategoria
         );
+    }
+
+    @Transactional
+    public ProdutoDetalheDTO cadastrarProdutoApi(ProdutoApiDTO dto) {
+        Loja loja = lojaRepository.findById(dto.lojaId())
+            .orElseThrow(() -> new RegraDeNegocioException("Loja não encontrada com o ID: " + dto.lojaId()));
+
+        Categoria categoria = categoriaRepository.findById(dto.categoriaId())
+            .orElseThrow(() -> new RegraDeNegocioException("Categoria não encontrada com o ID: " + dto.categoriaId()));
+
+        Produto novoProduto = new Produto();
+        novoProduto.setNome(dto.nome());
+        novoProduto.setDescricao(dto.descricao());
+        novoProduto.setPreco(dto.preco());
+        novoProduto.setEstoque(dto.estoque());
+        novoProduto.setLoja(loja);
+        novoProduto.adicionarCategoria(categoria);
+        novoProduto.setImagemPrincipalUrl(null); 
+        
+        Produto produtoSalvo = produtoRepository.save(novoProduto);
+        
+        return converterParaDetalheDTO(produtoSalvo);
+    }
+    
+    @Transactional
+    public ProdutoDetalheDTO atualizarProdutoApi(Long id, ProdutoApiDTO dto) {
+        Produto produto = produtoRepository.findById(id)
+            .orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+        
+        if (!produto.getLoja().getId().equals(dto.lojaId())) {
+             throw new RegraDeNegocioException("Não é permitido alterar a loja de um produto.");
+        }
+        Categoria categoria = categoriaRepository.findById(dto.categoriaId())
+            .orElseThrow(() -> new RegraDeNegocioException("Categoria não encontrada com o ID: " + dto.categoriaId()));
+
+        produto.setNome(dto.nome());
+        produto.setDescricao(dto.descricao());
+        produto.setPreco(dto.preco());
+        produto.setEstoque(dto.estoque());
+        produto.getCategorias().clear();
+        produto.adicionarCategoria(categoria);
+
+        Produto produtoAtualizado = produtoRepository.save(produto);
+
+        return converterParaDetalheDTO(produtoAtualizado);
+    }
+
+    @Transactional
+    public void excluirProdutoApi(Long id) {
+        if (!produtoRepository.existsById(id)) {
+            throw new ProdutoNaoEncontradoException(id);
+        }
+        produtoRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProdutoDetalheDTO> buscarTodos() {
+        return produtoRepository.findAll().stream()
+                .map(this::converterParaDetalheDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProdutoDetalheDTO> buscarPorCategoriaId(Long categoriaId) {
+        if (!categoriaRepository.existsById(categoriaId)) {
+            throw new RegraDeNegocioException("Categoria não encontrada com o ID: " + categoriaId);
+        }
+        return produtoRepository.findByCategoriaId(categoriaId).stream()
+            .map(this::converterParaDetalheDTO)
+            .collect(Collectors.toList());
     }
 }
