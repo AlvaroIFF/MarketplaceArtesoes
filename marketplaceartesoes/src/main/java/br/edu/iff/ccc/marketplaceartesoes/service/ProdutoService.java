@@ -164,25 +164,36 @@ public class ProdutoService {
                 produto.getNome(),
                 produto.getImagemPrincipalUrl(),
                 produto.getPreco(),
-                produto.getLoja().getArtesao().getNome()
+                produto.getLoja().getArtesao().getNome(),
+                produto.getEstoque()
         );
     }
 
     private ProdutoDetalheDTO converterParaDetalheDTO(Produto produto) {
+    // Coleta os nomes das categorias associadas ao produto
         Set<String> nomesCategoria = produto.getCategorias().stream()
-                .map(Categoria::getNome)
-                .collect(Collectors.toSet());
+            .map(Categoria::getNome)
+            .collect(Collectors.toSet());
 
+        // Verificações para evitar NullPointerException
+            Long lojaId = (produto.getLoja() != null) ? produto.getLoja().getId() : null;
+        String nomeLoja = (produto.getLoja() != null) ? produto.getLoja().getNome() : "Loja não informada";
+        String nomeArtesao = (produto.getLoja() != null && produto.getLoja().getArtesao() != null) 
+                         ? produto.getLoja().getArtesao().getNome() 
+                         : "Artesão não informado";
+
+        // Retorna o DTO populado com todos os dados necessários
         return new ProdutoDetalheDTO(
-                produto.getId(),
-                produto.getNome(),
-                produto.getDescricao(),
-                produto.getImagemPrincipalUrl(),
-                produto.getPreco(),
-                produto.getEstoque(),
-                produto.getLoja().getArtesao().getNome(),
-                produto.getLoja().getNome(),
-                nomesCategoria
+            produto.getId(),
+            produto.getNome(),
+            produto.getDescricao(),
+            produto.getImagemPrincipalUrl(),
+            produto.getPreco(),
+            produto.getEstoque(),
+            lojaId, 
+            nomeLoja,
+            nomeArtesao,
+            nomesCategoria
         );
     }
 }

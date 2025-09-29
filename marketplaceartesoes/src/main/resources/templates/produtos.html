@@ -5,25 +5,27 @@
 
 <header th:replace="~{baseLayout :: baseHeaderPage}"></header>
 
-<main class="conteudo">
+<main class="conteudo-principal">
     <section class="product-listing">
-        <h2>Nossos Produtos</h2>
 
-        <div class="filtros-categorias">
-            <span style="font-weight: bold; margin-right: 10px;">Filtrar por:</span>
-    
-                <a th:href="@{/produtos}" 
-                    th:classappend="${categoriaSelecionada == null} ? 'filtro-ativo' : ''"
-                    class="filtro-link">Todos</a>
-    
-                <a th:each="cat : ${categorias}" 
-                    th:href="@{/produtos(categoria=${cat.nome})}" 
-                    th:text="${cat.nome}"
-                    th:classappend="${#strings.equalsIgnoreCase(categoriaSelecionada, cat.nome)} ? 'filtro-ativo' : ''"
-                    class="filtro-link">
-                    Nome da Categoria
-                </a>
+        <div class="listing-header">
+            <h2>Nossos Produtos</h2>
+
+            <div class="filtros-categorias-select">
+                <label for="categoria-select">Filtrar por:</label>
+                <select id="categoria-select" onchange="location = this.value;">
+                    <option th:value="@{/produtos}" 
+                            th:selected="${categoriaSelecionada == null}">Todos</option>
+                    <option th:each="cat : ${categorias}" 
+                            th:value="@{/produtos(categoria=${cat.nome})}" 
+                            th:text="${cat.nome}"
+                            th:selected="${#strings.equalsIgnoreCase(categoriaSelecionada, cat.nome)}">
+                        Nome da Categoria
+                    </option>
+                </select>
+            </div>
         </div>
+
         <div class="product-grid">
             <div class="product-card" th:each="produto : ${produtos}">
                 <a th:href="@{/produtos/{id}(id=${produto.id})}">

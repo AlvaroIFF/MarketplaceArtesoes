@@ -57,8 +57,8 @@ public class ArtesaoService {
             throw new RegraDeNegocioException("Já existe uma loja com este nome.");
         }
 
-        String fotoPerfilUrl = fileStorageService.storeFile(fotoPerfil);
-        String imagemBannerUrl = fileStorageService.storeFile(fotoLoja);
+        String fotoPerfilUrl = fileStorageService.salvarImagem(fotoPerfil);
+        String imagemBannerUrl = fileStorageService.salvarImagem(fotoLoja);
 
         Artesao novoArtesao = new Artesao(
                 dados.nome(),
@@ -186,15 +186,6 @@ public class ArtesaoService {
     }
 
     private ArtesaoDTO converterParaDTO(Artesao artesao) {
-        String nomeLoja = artesao.getLoja() != null ? artesao.getLoja().getNome() : null;
-        String descricaoLoja = artesao.getLoja() != null ? artesao.getLoja().getDescricao() : null;
-
-        return new ArtesaoDTO(
-                artesao.getId(),
-                artesao.getNome(),
-                artesao.getEmail(),
-                nomeLoja,
-                descricaoLoja
-        );
+        return new ArtesaoDTO(artesao);
     }
 }

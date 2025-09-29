@@ -167,7 +167,7 @@ public class ArtesaoController {
         }
 
         try {
-            String imagemUrl = fileStorageService.storeFile(imagemProduto);
+            String imagemUrl = fileStorageService.salvarImagem(imagemProduto);
 
             ProdutoCadastroDTO dadosComImagem = new ProdutoCadastroDTO(
                     dadosProduto.nome(),

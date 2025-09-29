@@ -54,7 +54,7 @@ public class ClienteService {
       throw new RegraDeNegocioException("Este CPF já está em uso.");
     }
 
-    String fotoUrl = fileStorageService.storeFile(foto);
+    String fotoUrl = fileStorageService.salvarImagem(foto);
 
     Cliente novoCliente = new Cliente(
       dadosCadastro.nome(),

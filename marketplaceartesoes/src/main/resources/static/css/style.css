@@ -1,51 +1,76 @@
 /* ==========================================================================
-   1. ESTILOS GERAIS E LAYOUT PRINCIPAL
+   1. ESTILOS GERAIS E LAYOUT PRINCIPAL (COM FUNDO DE MADEIRA)
    ========================================================================== */
 
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #ffecd1;
+    background-color: #f4f4f4; /* Cor de fundo neutra para o conteúdo principal */
     color: #222;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-header {
+header, footer {
     text-align: center;
-    background-color: #554834;
-    color: white;
+    flex-shrink: 0; /* Impede que encolham */
+    
+    background-color: #554834; /* Cor de fundo caso a imagem falhe */
+    background-image: url('/images/fundo-madeira.jpg');
+    background-repeat: repeat;
+    background-attachment: fixed;
+    
+    color: white; /* Garante que o texto seja branco */
     padding: 20px 0;
-    flex-shrink: 0; /* Impede o header de encolher */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Sombra para profundidade */
 }
 
 header h1 {
     margin: 0 0 15px 0;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
+    color: white; /* Garante que o H1 seja branco */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Sombra para legibilidade */
+}
+
+/* Garante que os links do menu também fiquem brancos */
+header .menu a {
+    color: white;
+    font-size: 1.2rem;
 }
 
 main.conteudo {
-    flex-grow: 1; /* Faz o <main> expandir para empurrar o footer para baixo */
+    flex-grow: 1; 
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
 }
 
-/* Classe especial para a home page não ser centralizada */
+main.conteudo-principal {
+    flex-grow: 1;
+    width: 100%;
+    max-width: 1200px; 
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box; 
+}
+
 .conteudo-home {
     display: block;
     padding: 0;
 }
 
 footer {
-    text-align: center;
-    background: #554834;
+    padding: 15px 0; /* Padding um pouco menor para o rodapé */
+}
+
+footer p {
+    margin: 0;
     color: white;
-    padding: 10px;
-    flex-shrink: 0; /* Impede o footer de encolher */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    font-size: 1.3rem;
 }
 
 /* ==========================================================================
@@ -106,12 +131,14 @@ footer {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select { /* Adicionado 'select' aqui */
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1em;
+    box-sizing: border-box; /* Garante que o padding não afete a largura */
 }
 
 .form-link {
@@ -212,6 +239,104 @@ th { background-color: #f2f2f2; font-weight: bold; }
    4. ESTILOS ESPECÍFICOS POR PÁGINA
    ========================================================================== */
 
+.choice-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 50px auto; /* Centraliza vertical e horizontalmente na página */
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.choice-container h2 {
+    font-size: 2.2em;
+    color: var(--cor-header-footer);
+    margin-bottom: 15px;
+}
+
+.choice-container p {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.choice-options {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Espaçamento entre os cards */
+    flex-wrap: wrap; /* Permite que os cards quebrem para a linha de baixo em telas menores */
+}
+
+.choice-card {
+    background-color: var(--cor-fundo); /* Cor de fundo mais clara para o card */
+    border: 2px solid var(--cor-primaria); /* Borda destacada com sua cor primária */
+    border-radius: 12px;
+    padding: 30px;
+    text-decoration: none;
+    color: var(--cor-texto-principal);
+    flex: 1; /* Permite que os cards cresçam para preencher o espaço */
+    min-width: 280px; /* Largura mínima para o card antes de quebrar */
+    max-width: 350px; /* Largura máxima para cada card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Alinha o conteúdo ao topo do card */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.choice-card:hover {
+    transform: translateY(-8px); /* Efeito de "levantar" ao passar o mouse */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    background-color: #fff3e0; /* Fundo ligeiramente diferente no hover */
+}
+
+.choice-icon {
+    font-size: 3em; /* Tamanho grande para os ícones */
+    margin-bottom: 20px;
+    color: var(--cor-header-footer); /* Cor do ícone */
+}
+
+.choice-card h3 {
+    font-size: 1.6em;
+    color: var(--cor-header-footer);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.choice-card p {
+    font-size: 1em;
+    color: #555;
+    line-height: 1.5;
+    flex-grow: 1; /* Faz o parágrafo preencher o espaço para alinhar os botões */
+}
+
+/* Garante que o main continue centralizando corretamente quando esta página é exibida */
+main.conteudo.choice-page {
+    justify-content: center;
+    align-items: center;
+}
+
+/* Responsividade para a página de escolha */
+@media (max-width: 768px) {
+    .choice-container {
+        margin: 30px 15px;
+        padding: 20px;
+    }
+    .choice-container h2 {
+        font-size: 1.8em;
+    }
+    .choice-options {
+        flex-direction: column; /* Empilha os cards em telas menores */
+        gap: 20px;
+    }
+    .choice-card {
+        max-width: 100%; /* Cards ocupam a largura total disponível */
+        padding: 25px;
+    }
+}
+
 /* --- Home Page (index.html) --- */
 .hero {
     background-image: url('../images/pagina-inicial.jpg');
@@ -264,32 +389,193 @@ th { background-color: #f2f2f2; font-weight: bold; }
 
 .meet-artisans { background-color: #f7f1e6; }
 
-/* --- Cart Page (carrinho.html) --- */
-.cart-page h2 { text-align: center; margin-bottom: 30px; }
-.cart-empty { text-align: center; margin-top: 50px; padding: 20px; border: 1px dashed #ccc; border-radius: 8px; background-color: #f9f9f9; }
-.cart-empty p { font-size: 1.2em; margin-bottom: 20px; }
-.cart-container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
-.cart-table { flex: 2; min-width: 500px; width: 100%; margin-bottom: 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
-.cart-table thead th { background-color: #f5f5f5; }
-.cart-table .product-image img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
-.form-update-quantity { display: flex; align-items: center; gap: 5px; }
-.item-quantity { width: 60px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-.cart-summary { flex: 1; min-width: 300px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.cart-summary h3 { margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1em; }
-.summary-row.total { font-weight: bold; font-size: 1.3em; border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; }
+/* --- PÁGINA DE PRODUTOS --- */
+.product-listing {
+    width: 100%;
+}
+
+.listing-header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 10px 0;
+}
+
+.listing-header h2 {
+    margin: 0;
+    display: inline-block;
+}
+
+.filtros-categorias-select {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filtros-categorias-select label {
+    font-weight: bold;
+    color: #555;
+}
+
+.filtros-categorias-select select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+/* --- NOVO: PÁGINA DO CARRINHO (carrinho.html) --- */
+.cart-page h2 { 
+    text-align: center; 
+    margin-bottom: 30px; 
+}
+
+.cart-empty { 
+    text-align: center; 
+    margin-top: 50px; 
+    padding: 20px; 
+    border: 1px dashed #ccc; 
+    border-radius: 8px; 
+    background-color: #f9f9f9; 
+}
+.cart-empty p { 
+    font-size: 1.2em; 
+    margin-bottom: 20px; 
+}
+
+.cart-container { 
+    display: flex; 
+    gap: 30px; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: flex-start; /* Alinha os itens no topo */
+}
+
+.cart-table { 
+    flex: 2; /* Ocupa 2/3 do espaço */
+    min-width: 500px; 
+    width: 100%; 
+    margin-bottom: 20px; 
+    background-color: #fff; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    border-radius: 8px; 
+    overflow: hidden; 
+}
+.cart-table thead th { 
+    background-color: #f5f5f5; 
+}
+
+/* *** ALTERAÇÃO CRÍTICA AQUI *** */
+.cart-table .product-image img { 
+    width: 80px;  /* Largura fixa */
+    height: 80px; /* Altura fixa */
+    object-fit: cover; /* Recorta a imagem para preencher sem distorcer */
+    border-radius: 4px; 
+    border: 1px solid #eee; 
+    display: block; /* Remove espaços extras */
+}
+
+.form-update-quantity { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+.item-quantity { 
+    width: 60px; 
+    padding: 5px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    text-align: center; 
+}
+
+.cart-summary { 
+    flex: 1; /* Ocupa 1/3 do espaço */
+    min-width: 300px; 
+    background-color: #fff; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    position: sticky; /* Faz o resumo "flutuar" ao rolar a página */
+    top: 20px; /* Distância do topo */
+}
+.cart-summary h3 { 
+    margin-top: 0; 
+    margin-bottom: 20px; 
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 10px; 
+}
+.summary-row { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 10px; 
+    font-size: 1.1em; 
+}
+.summary-row.total { 
+    font-weight: bold; 
+    font-size: 1.3em; 
+    border-top: 1px solid #eee; 
+    padding-top: 15px; 
+    margin-top: 15px; 
+}
+
 
 /* ==========================================================================
    5. RESPONSIVIDADE
    ========================================================================== */
+
+@media (max-width: 992px) {
+    .cart-container {
+        flex-direction: column; /* Empilha a tabela e o resumo */
+        align-items: center; /* Centraliza os itens empilhados */
+    }
+    .cart-table, .cart-summary {
+        min-width: unset;
+        width: 100%;
+        max-width: 600px; /* Limita a largura em telas de tablet */
+    }
+    .cart-summary {
+        position: static; /* Remove o efeito "flutuante" em telas menores */
+    }
+}
+
 @media (max-width: 768px) {
-    .cart-container { flex-direction: column; }
-    .cart-table, .cart-summary { min-width: unset; width: 100%; }
+    .listing-header {
+        position: static;
+        text-align: left;
+    }
+    .listing-header h2 {
+        margin-bottom: 15px;
+    }
+    .filtros-categorias-select {
+        position: static;
+        transform: none;
+        width: 100%;
+    }
+    .filtros-categorias-select select {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
-    .form-update-quantity { flex-direction: column; align-items: flex-start; }
-    .item-quantity { width: 50px; margin-bottom: 5px; }
+    .form-update-quantity {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .item-quantity {
+        width: 50px;
+        margin-bottom: 5px;
+    }
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ==========================================================================
@@ -303,185 +589,615 @@ th { background-color: #f2f2f2; font-weight: bold; }
     gap: 40px; /* Espaço entre a imagem e as informações */
     max-width: 1100px; /* Largura máxima para todo o conteúdo da página */
     margin: 40px auto; /* Centraliza o container na página */
-    padding: 20px;
-    background-color: var(--cor-fundo-card);
+    padding: 30px;
+    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    align-items: flex-start;
 }
 
 /* Container da imagem (coluna da esquerda) */
 .product-detail-image {
-    flex: 1; /* Tenta ocupar metade do espaço */
-    min-width: 300px; /* Largura mínima antes de quebrar a linha */
+    flex: 1 1 400px;
+    max-width: 50%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 
-/* A IMAGEM EM SI - AQUI CONTROLAMOS O TAMANHO */
+/* A IMAGEM EM SI - AQUI CONTROLAMOS O TAMANHO E O RECORTE */
 .product-detail-image img {
-    max-width: 100%;  /* Garante que a imagem nunca ultrapasse o container dela */
-    
-    /* ***** VOCÊ PODE MUDAR O VALOR ABAIXO ***** */
-    max-height: 500px; /* Define uma ALTURA MÁXIMA para a imagem */
-    
-    width: auto;      /* Deixa a largura se ajustar para manter a proporção */
-    height: auto;     /* Deixa a altura se ajustar para manter a proporção */
-    
+    width: 100%;
+    max-width: 400px; /* Largura máxima da imagem */
+    height: 400px; /* Altura fixa da imagem */
+    object-fit: cover; /* Recorta a imagem para preencher, mantendo a proporção */
     border-radius: 8px;
-    object-fit: contain; /* Garante que a imagem inteira apareça, sem cortes */
-    border: 1px solid var(--cor-borda);
+    border: 1px solid #eee;
 }
 
 /* Container das informações (coluna da direita) */
 .product-detail-info {
-    flex: 1; /* Tenta ocupar a outra metade do espaço */
-    min-width: 300px;
+    flex: 1 1 50%;
+    min-width: 350px;
     text-align: left;
 }
 
-.product-detail-info h1 {
+.product-detail-info h2 {
     font-size: 2.5em;
+    margin-top: 0;
     margin-bottom: 10px;
 }
 
-.product-detail-info .price {
-    font-size: 2em;
-    font-weight: bold;
-    color: var(--cor-primaria);
+.product-detail-info .artisan-info {
+    font-size: 1em;
+    color: #666;
     margin-bottom: 20px;
 }
 
-.product-detail-info .description {
+.product-detail-info .price-detail {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: var(--cor-header-footer);
+    margin-bottom: 25px;
+}
+
+.product-detail-info .product-description h3 {
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.product-detail-info .product-description p {
     font-size: 1.1em;
     line-height: 1.6;
+    color: #555;
     margin-bottom: 30px;
+}
+
+.product-detail-info .product-stock {
+    margin-bottom: 25px;
+    font-size: 1em;
+}
+
+.product-detail-info .product-stock span {
+    font-weight: bold;
+}
+
+.product-detail-info .product-categories {
+    margin-bottom: 30px;
+}
+
+.product-detail-info .product-categories strong {
+    margin-right: 10px;
+}
+
+.category-tag {
+    display: inline-block;
+    background-color: var(--cor-primaria);
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin: 0 5px 5px 0;
+    font-size: 0.9em;
 }
 
 .product-detail-info .actions {
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-top: 30px;
 }
 
-.product-detail-info .actions input[type="number"] {
-    width: 70px;
+.actions form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.actions label {
+    font-weight: bold;
+}
+
+.actions input[type="number"] {
+    width: 80px;
     padding: 10px;
     text-align: center;
-    border: 1px solid var(--cor-borda);
+    border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-/* ==========================================================================
-   PÁGINA DE ESCOLHA DE CADASTRO (escolha-cadastro.html)
-   ========================================================================== */
-
-/* Container principal da página de escolha */
-.choice-container {
-    max-width: 800px;
-    margin: 40px auto; /* Centraliza o container */
-    padding: 40px;
-    text-align: center;
-}
-
-.choice-container h2 {
-    font-size: 2.2em;
-    margin-bottom: 15px;
-    color: var(--cor-texto-principal);
-}
-
-.choice-container p {
+.actions .btn-primary {
+    width: auto;
     font-size: 1.1em;
-    color: #6c757d; /* Um cinza suave */
-    margin-bottom: 40px;
 }
 
-/* Container que alinha os dois painéis de escolha */
-.choice-options {
-    display: flex;
-    justify-content: center;
-    gap: 40px; /* Espaço entre os dois painéis */
-    flex-wrap: wrap; /* Permite que os painéis quebrem a linha em telas menores */
+
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
+@media (max-width: 992px) {
+    .product-detail {
+        flex-direction: column;
+        align-items: center;
+    }
+    .product-detail-image {
+        max-width: 80%;
+    }
+    .product-detail-info {
+        min-width: unset;
+        width: 100%;
+        text-align: center;
+    }
+    .actions {
+        justify-content: center;
+    }
 }
 
-/* O estilo do painel clicável - A MÁGICA ACONTECE AQUI */
-.choice-card {
-    flex: 1; /* Faz cada painel tentar ocupar o mesmo espaço */
-    min-width: 300px; /* Largura mínima antes de quebrar a linha */
-    padding: 40px 30px;
-    border: 1px solid var(--cor-borda);
-    border-radius: 12px;
-    background-color: var(--cor-fundo-card);
-    text-decoration: none;
-    color: var(--cor-texto-principal);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+@media (max-width: 768px) {
+    .cart-container { flex-direction: column; }
+    .cart-table, .cart-summary { min-width: unset; width: 100%; }
 
-    /* Efeito suave de transição ao passar o mouse */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .listing-header { position: static; text-align: left; display: block; }
+    .listing-header h2 { margin-bottom: 15px; }
+    .filtros-categorias-select { position: static; transform: none; width: 100%; }
+    .filtros-categorias-select select { width: 100%; }
 }
 
-/* Efeito de "levantar" o painel ao passar o mouse por cima */
-.choice-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    border-color: var(--cor-primaria);
-}
-
-/* Estilo para o ícone (emoji) */
-.choice-icon {
-    font-size: 3.5em; /* Aumenta o tamanho do emoji */
-    margin-bottom: 20px;
-    display: block;
-}
-
-.choice-card h3 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-.choice-card p {
-    font-size: 1em;
-    line-height: 1.5;
-    color: #6c757d;
-    margin-bottom: 0;
+@media (max-width: 480px) {
+    .form-update-quantity { flex-direction: column; align-items: flex-start; }
+    .item-quantity { width: 50px; margin-bottom: 5px; }
+    .product-grid { grid-template-columns: 1fr; }
+    
+    .actions form {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    .actions input[type="number"], .actions .btn-primary {
+        width: 100%;
+        max-width: 250px;
+    }
 }
 
 /* ==========================================================================
    PÁGINAS DE DASHBOARD (Area Cliente e Area Artesão)
    ========================================================================== */
 
-/* Container geral para as seções dos dashboards */
 .user-dashboard {
-    max-width: 1100px; /* Largura máxima do conteúdo */
-    margin: 40px auto; /* Centraliza a seção na página */
+    max-width: 1200px;
+    margin: 20px auto;
     padding: 20px;
-    text-align: left;
 }
 
 .user-dashboard h2 {
-    font-size: 2.2em;
-    margin-bottom: 20px;
-    border-bottom: 2px solid var(--cor-borda);
+    text-align: center;
+    font-size: 2.5em;
+    color: var(--cor-header-footer);
+    margin-bottom: 30px;
     padding-bottom: 10px;
+    border-bottom: 2px solid var(--cor-primaria);
 }
 
 .dashboard-content {
     display: flex;
     flex-wrap: wrap;
-    gap: 40px; /* Espaço entre as colunas "Meus Dados" e "Histórico de Pedidos" */
+    gap: 30px;
+    align-items: flex-start; /* Alinha colunas no topo */
 }
 
-.user-details, .order-history, .product-management {
-    flex: 1; /* Faz as colunas dividirem o espaço */
-    min-width: 300px;
-    background-color: var(--cor-fundo-card);
+/* Coluna da Esquerda (Perfil + Detalhes) */
+.dashboard-profile-column {
+    flex: 1 1 320px; /* Base de 320px, pode crescer e encolher */
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Card de Perfil com Foto (Comum Cliente/Artesão) */
+.profile-card {
+    background: var(--cor-fundo-card, #fff);
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%; /* Faz a imagem ficar redonda */
+    overflow: hidden;
+    border: 4px solid var(--cor-primaria);
+    background-color: #f0f0f0;
+}
+
+.profile-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem preencha o círculo sem distorcer */
+}
+
+.profile-card h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.6em;
+    color: var(--cor-texto-principal);
+}
+
+.profile-card p {
+    margin: 0 0 20px 0;
+    color: #666;
+    font-size: 1em;
+}
+
+.profile-card .btn-secondary {
+    width: 100%;
+}
+
+/* Card de "Meus Dados" (Cliente) ou "Minha Loja" (Artesão) */
+.user-details, .store-details { /* Ambos usarão estes estilos base */
+    background: var(--cor-fundo-card, #fff);
     padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
-.user-details h3, .order-history h3, .product-management h3 {
+.user-details h3, .store-details h3 {
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.user-details p, .store-details p {
+    margin: 0 0 15px 0;
+    line-height: 1.6;
+}
+
+.user-details strong, .store-details strong {
+    color: var(--cor-header-footer);
+}
+
+/* Coluna da Direita (Histórico de Pedidos ou Gerenciamento de Produtos) */
+.order-history, .product-management { /* Ambos usarão estes estilos base */
+    flex: 2 1 500px; /* Ocupa mais espaço, base de 500px */
+    background: var(--cor-fundo-card, #fff);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.order-history h3, .product-management h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+/* Botão "Adicionar Novo Produto" */
+.add-product-btn {
+    display: inline-block; /* Permite espaçamento em volta */
+    margin-bottom: 20px; /* Espaço abaixo do botão */
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+.empty-history { /* Reutilizado para produtos vazios também */
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Tabela de Pedidos/Produtos (reutilizada) */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px; /* Espaço entre o botão e a tabela */
+}
+
+.order-table th, .order-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-table thead th {
+    background-color: #f9f9f9;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    color: #555;
+}
+
+.order-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.order-table tbody tr:hover {
+    background-color: #f7f7f7;
+}
+
+.status-tag {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.85em;
+    background-color: #e0e0e0;
+    color: #555;
+}
+
+/* Botões pequenos para tabelas (Editar/Remover) */
+.btn-update-small, .btn-remove-small {
+    padding: 6px 10px;
+    font-size: 0.85em;
+    border-radius: 4px;
+    text-decoration: none; /* Para links, remover sublinhado */
+    display: inline-block; /* Para ter margem */
+    margin: 2px;
+    background-color: #28a745; /* Verde */
+    color: white;
+}
+
+.btn-update-small {
+    background-color: var(--cor-sucesso);
+    color: white;
+}
+.btn-update-small:hover {
+    background-color: #218838; /* Verde mais escuro */
+}
+
+.btn-remove-small {
+    background-color: #dc3545; /* Vermelho */
+    color: white;
+}
+.btn-remove-small:hover {
+    background-color: #c82333; /* Vermelho mais escuro */
+}
+
+/* Botão "Remover" estilizado como link */
+.link-button {
+    background: none;
+    border: none;
+    color: var(--cor-perigo); /* Cor de link de perigo */
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1em;
+    padding: 0;
+    margin: 0;
+    font-weight: normal;
+    transition: color 0.2s ease;
+}
+.link-button:hover {
+    color: var(--cor-perigo-hover);
+}
+
+
+/* Responsividade do Dashboard (Comum Cliente/Artesão) */
+@media (max-width: 992px) {
+    .dashboard-content {
+        flex-direction: column;
+        align-items: stretch; /* Faz as colunas ocuparem a mesma largura */
+    }
+    .dashboard-profile-column {
+        max-width: 100%;
+    }
+    .profile-card .btn-secondary {
+        max-width: 300px; /* Limita a largura do botão em telas menores */
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .order-table thead {
+        display: none; /* Esconde o cabeçalho da tabela em telas muito pequenas */
+    }
+
+    .order-table tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .order-table td {
+        display: block;
+        text-align: right !important; /* Alinha o conteúdo à direita */
+        border-bottom: 1px dashed #eee;
+        position: relative;
+        padding-left: 50%; /* Espaço para o label */
+    }
+
+    .order-table td:last-child {
+        border-bottom: none;
+    }
+
+    .order-table td::before {
+        content: attr(data-label); /* Usa o atributo data-label como pseudo-elemento */
+        position: absolute;
+        left: 15px;
+        width: calc(50% - 30px);
+        white-space: nowrap;
+        font-weight: bold;
+        color: #777;
+        text-align: left;
+    }
+
+    .order-table td:first-of-type {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .order-table td:last-of-type {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    
+    .btn-update-small, .btn-remove-small {
+        font-size: 0.8em;
+        padding: 5px 8px;
+    }
+
+    .product-management .add-product-btn {
+        width: 100%;
+        max-width: 250px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+}
+
+.order-table td a.btn-update-small {
+    background-color: #28a745; /* Verde */
+    color: white;
+    text-decoration: none; /* Remove o sublinhado */
+    border: none;
+    display: inline-block; /* Importante para que padding e margin funcionem bem */
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    margin: 2px;
+}
+
+/* Garante que o botão "Remover" (que é um <button> com essa classe) também tenha cor */
+.order-table td button.btn-remove-small {
+    background-color: #dc3545; /* Vermelho */
+    color: white;
+    border: none;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    margin: 2px;
+}
+
+/* Estilos de hover para o botão "Editar" */
+.order-table td a.btn-update-small:hover {
+    background-color: #218838; /* Verde mais escuro */
+    transform: scale(1.05); /* Efeito de zoom sutil */
+}
+
+/* Estilos de hover para o botão "Remover" */
+.order-table td button.btn-remove-small:hover {
+    background-color: #c82333; /* Vermelho mais escuro */
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   PÁGINA DA LOJA (loja.html)
+   ========================================================================== */
+
+.store-banner {
+    width: 100%;
+    height: 40vh; /* 40% da altura da tela */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+.store-banner-overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* Sombra para legibilidade do texto */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.store-banner h1 {
+    font-size: 3em;
+    margin: 0;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.store-banner p {
+    font-size: 1.2em;
+    margin-top: 10px;
+    max-width: 600px;
+}
+
+.store-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 40px;
+    align-items: flex-start;
+}
+
+.store-info {
+    flex: 1 1 300px; /* Coluna lateral com no mínimo 300px */
+    background-color: var(--cor-fundo-card, #fff);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: static;
+    top: 20px;
+}
+
+.store-info h3, .store-info h4 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    color: var(--cor-header-footer);
+}
+
+.store-info hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 20px 0;
+}
+
+.store-info p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.store-products {
+    flex: 3 1 600px; /* Coluna de produtos, 3x maior, com no mínimo 600px */
+}
+
+.store-products h3 {
+    font-size: 1.8em;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--cor-header-footer);
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .store-content {
+        flex-direction: column;
+    }
+    .store-info {
+        position: static; /* Remove o efeito flutuante em telas menores */
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .store-products {
+        width: 100%;
+    }
 }

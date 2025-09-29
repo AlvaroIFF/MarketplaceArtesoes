@@ -8,13 +8,15 @@
 <main class="conteudo">
     <section class="product-detail" th:object="${produto}">
         <div class="product-detail-image">
-            <img th:src="*{imagemUrl}" th:alt="*{nome}" />
+            <img th:src="*{imagemPrincipalUrl}" th:alt="*{nome}" />
         </div>
         <div class="product-detail-info">
             <h2 th:text="*{nome}">Nome do Produto</h2>
             <p class="artisan-info">
-                Vendido por <strong th:text="*{nomeLoja}">Nome da Loja</strong> 
-                (Artesão(ã): <span th:text="*{nomeArtesao}">Nome do Artesão</span>)
+                Vendido por 
+                <a th:href="@{/lojas/{id}(id=${produto.lojaId})}" class="store-link">
+                    <strong th:text="${produto.nomeLoja}">Nome da Loja</strong>
+                </a>
             </p>
             
             <p class="price-detail" th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</p>
@@ -30,7 +32,7 @@
 
             <div class="product-categories">
                 <strong>Categorias:</strong>
-                <span class="category-tag" th:each="cat : *{categorias}" th:text="${cat}">Categoria</span>
+                <span class="category-tag" th:each="cat : *{nomesCategoria}" th:text="${cat}">Categoria</span>
             </div>
             
             <div class="actions">

@@ -7,5 +7,6 @@ public record ProdutoDTO(
     String nome,
     String imagemUrl,
     BigDecimal preco,
-    String nomeArtesao
+    String nomeArtesao,
+    Integer estoque
 ) {}

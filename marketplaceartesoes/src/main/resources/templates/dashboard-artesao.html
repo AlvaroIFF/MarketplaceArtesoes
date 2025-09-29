@@ -5,53 +5,66 @@
 
 <header th:replace="~{baseLayout :: baseHeaderPage}"></header>
 
-<main class="conteudo conteudo-home">
+<main class="conteudo-principal">
     <section class="user-dashboard">
         <h2>Dashboard do Artesão</h2>
 
         <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
         <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
-
-        <p>Bem-vindo(a), <strong th:text="${artesao.nome}">Nome do Artesão</strong>!</p>
-
+        
         <div class="dashboard-content">
-            <div class="user-details">
-                <h3>Informações da Loja</h3>
-                <p><strong>Nome da Loja:</strong> <span th:text="${artesao.nomeLoja}"></span></p>
-                <p><strong>Descrição:</strong> <span th:text="${artesao.descricaoLoja}"></span></p>
-                
-                <a th:href="@{/artesao/editar}" class="btn-secondary" style="margin-top: 15px;">Editar Perfil e Loja</a>
+            <div class="dashboard-profile-column">
+                <div class="profile-card">
+                    <div class="profile-picture">
+                        <img th:src="${artesao.fotoUrl != null and !artesao.fotoUrl.isEmpty() ? artesao.fotoUrl : '/images/default-avatar.png'}" alt="Foto de Perfil do Artesão"/>
+                    </div>
+                    <h3 th:text="${artesao.nome}">Nome do Artesão</h3>
+                    <p th:text="${artesao.email}">email@exemplo.com</p>
+                    <a th:href="@{/artesao/editar}" class="btn-secondary">Editar Perfil e Loja</a>
+                </div>
+
+                <div class="store-details">
+                    <h3>Minha Loja</h3>
+                    <p>
+                        <strong>Nome:</strong> 
+                        <a th:href="@{/lojas/{id}(id=${artesao.lojaId})}" class="store-dashboard-link">
+                            <span th:text="${artesao.nomeLoja}"></span>
+                        </a>
+                    </p>
+                    <p><strong>Descrição:</strong> <span th:text="${artesao.descricaoLoja}"></span></p>
+                </div>
             </div>
 
             <div class="product-management">
                 <h3>Meus Produtos</h3>
-                <a th:href="@{/artesao/produtos/novo}" class="btn-primary">Adicionar Novo Produto</a>
+                <a th:href="@{/artesao/produtos/novo}" class="btn-primary add-product-btn">Adicionar Novo Produto</a>
                 
-                <div th:if="${produtos.isEmpty()}" class="mt-3">
+                <div th:if="${produtos.isEmpty()}" class="empty-history">
                     <p>Você ainda não cadastrou nenhum produto.</p>
                 </div>
                 
-                <table th:if="${!produtos.isEmpty()}" class="cart-table mt-3">
+                <table th:if="${!produtos.isEmpty()}" class="order-table mt-3">
                     <thead>
                         <tr>
                             <th>Produto</th>
                             <th>Preço</th>
+                            <th>Estoque</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="produto : ${produtos}">
-                            <td th:text="${produto.nome}">Nome do Produto</td>
-                            <td th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</td>
-                            <td>
-                                <a th:href="@{/artesao/produtos/editar/{id}(id=${produto.id})}">Editar</a> 
-                                | 
+                            <td data-label="Produto" th:text="${produto.nome}">Nome do Produto</td>
+                            <td data-label="Preço" th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</td>
+                            <td data-label="Estoque" th:text="${produto.estoque}">0</td>
+                            <td data-label="Ações">
+                                <a th:href="@{/artesao/produtos/editar/{id}(id=${produto.id})}" class="btn-update-small">Editar</a> 
                                 <form th:action="@{/artesao/produtos/remover/{id}(id=${produto.id})}" 
                                       method="post" 
                                       style="display:inline;"
                                       onsubmit="return confirm('Tem certeza que deseja remover o produto \'' + this.dataset.nomeProduto + '\'?');"
                                       th:data-nome-produto="${produto.nome}">
-                                    <button type="submit" class="link-button">Remover</button>
+                                    <button type="submit" class="btn-remove-small">Remover</button>
                                 </form>
                             </td>
                         </tr>
