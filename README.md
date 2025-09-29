@@ -93,6 +93,6 @@ Após iniciar o servidor, abra seu navegador de internet e acesse as seguintes U
     -   **JDBC URL:** `jdbc:h2:file:./data/exemplo`
     -   **User Name:** `sa` 
     -   **Password:** `password`
--   **Documentação Swagger:** [localhost:8080/swagger-ui.html](localhost:8080/swagger-ui.html)  
+-   **Documentação Swagger:** [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)  
 
 A aplicação estará rodando e pronta para ser utilizada!
