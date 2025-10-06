@@ -91,7 +91,8 @@ Após iniciar o servidor, abra seu navegador de internet e acesse as seguintes U
 -   **Página Inicial:** [http://localhost:8080/](http://localhost:8080/)
 -   **Console do Banco H2:** [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
     -   **JDBC URL:** `jdbc:h2:file:./data/exemplo`
-    -   **User Name:** `admin` 
-    -   **Password:** `admin`
+    -   **User Name:** `sa` 
+    -   **Password:** `password`
+-   **Documentação Swagger:** [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)  
 
 A aplicação estará rodando e pronta para ser utilizada!

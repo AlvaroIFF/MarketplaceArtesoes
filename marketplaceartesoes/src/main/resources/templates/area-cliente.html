@@ -5,26 +5,40 @@
 
 <header th:replace="~{baseLayout :: baseHeaderPage}"></header>
 
-<main class="conteudo conteudo-home">
+<main class="conteudo-principal">
     <section class="user-dashboard">
         <h2>Minha Conta</h2>
-        <p>Bem-vindo(a) de volta, <strong th:text="${cliente.nome}">Nome do Cliente</strong>!</p>
 
+        <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+        
         <div class="dashboard-content">
-            <div class="user-details">
-                <h3>Meus Dados</h3>
-                <p><strong>Nome:</strong> <span th:text="${cliente.nome}"></span></p>
-                <p><strong>E-mail:</strong> <span th:text="${cliente.email}"></span></p>
-                <p><strong>CPF:</strong> <span th:text="${cliente.cpf}"></span></p>
-                <a href="#" class="btn-secondary">Editar Dados</a>
+            <div class="dashboard-profile-column">
+                <div class="profile-card">
+                    <div class="profile-picture">
+                        <img th:src="${cliente.fotoUrl != null and !cliente.fotoUrl.isEmpty() ? cliente.fotoUrl : '/images/default-avatar.png'}" alt="Foto de Perfil do Cliente"/>
+                    </div>
+                    <h3 th:text="${cliente.nome}">Nome do Cliente</h3>
+                    <p th:text="${cliente.email}">email@exemplo.com</p>
+                    <a th:href="@{/clientes/editar}" class="btn-secondary">Editar Perfil</a>
+                </div>
+
+                <div class="user-details">
+                    <h3>Meus Dados</h3>
+                    <p><strong>Nome Completo:</strong> <span th:text="${cliente.nome}"></span></p>
+                    <p><strong>E-mail:</strong> <span th:text="${cliente.email}"></span></p>
+                    <p><strong>CPF:</strong> <span th:text="${cliente.cpf}"></span></p>
+                </div>
             </div>
 
             <div class="order-history">
                 <h3>Histórico de Pedidos</h3>
-                <div th:if="${pedidos.isEmpty()}">
+
+                <div th:if="${pedidos.isEmpty()}" class="empty-history">
                     <p>Você ainda não fez nenhum pedido.</p>
                 </div>
-                <table th:if="${!pedidos.isEmpty()}" class="cart-table">
+
+                <table th:if="${!pedidos.isEmpty()}" class="order-table">
                     <thead>
                         <tr>
                             <th>Nº do Pedido</th>
@@ -34,11 +48,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="pedido : ${pedidos}">
-                            <td th:text="${'#' + pedido.id}">#00001</td>
-                            <td th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">Data</td>
-                            <td th:text="${#numbers.formatCurrency(pedido.valorTotal)}">R$ 0,00</td>
-                            <td th:text="${pedido.status}">Status</td>
+                        <tr th:each="pedido : ${pedidos}" 
+                            th:onclick="'window.location.href=\'/pedidos/' + ${pedido.id} + '\';'" 
+                            style="cursor: pointer;">
+                            <td data-label="Pedido Nº" th:text="'#' + ${pedido.id}">#00001</td>
+                            <td data-label="Data" th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">Data</td>
+                            <td data-label="Valor" th:text="${#numbers.formatCurrency(pedido.valorTotal)}">R$ 0,00</td>
+                            <td data-label="Status"><span class="status-tag" th:text="${pedido.status}">Status</span></td>
                         </tr>
                     </tbody>
                 </table>

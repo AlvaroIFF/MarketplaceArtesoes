@@ -5,7 +5,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("ADMIN") // Rótulo para esta classe na tabela 'usuarios'
+@DiscriminatorValue("ADMIN") 
 public class Administrador extends Usuario {
 
     public Administrador() {

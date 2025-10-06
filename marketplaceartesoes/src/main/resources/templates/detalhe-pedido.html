@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo-principal" th:object="${pedido}">
+    <h2>Detalhes do Pedido <span th:text="${'#' + pedido.id}">#123</span></h2>
+
+    <div class="pedido-info">
+        <div><strong>Data do Pedido:</strong> <span th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}"></span></div>
+        <div><strong>Status:</strong> <span th:text="*{status}"></span></div>
+        <div><strong>Cliente:</strong> <span th:text="*{nomeCliente}"></span></div>
+        <div><strong>CPF:</strong> <span th:text="*{cpfCliente}"></span></div>
+    </div>
+
+    <h3>Itens do Pedido</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagem</th> <th>Produto</th>
+                    <th>Qtd.</th>
+                    <th>Preço Unit.</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : *{itens}">
+                    <td>
+                        <img th:src="${item.imagemProdutoUrl}" alt="Imagem do Produto" style="width: 50px; height: 50px; object-fit: cover;">
+                    </td> <td th:text="${item.nomeProduto}">Vaso de Cerâmica</td>
+                    <td th:text="${item.quantidade}">2</td>
+                    <td th:text="${'R$ ' + #numbers.formatDecimal(item.precoUnitario, 1, 'POINT', 2, 'COMMA')}">R$ 75,00</td>
+                    <td th:text="${'R$ ' + #numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="total-label">Valor Total do Pedido:</td>
+                    <td class="total-valor" th:text="${'R$ ' + #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <form th:action="@{/pedidos/{id}/remover(id=${pedido.id})}" method="post" onsubmit="return confirm('Tem certeza que deseja remover este pedido?');" style="display:inline;">
+        <button type="submit" class="btn-remove-small">Remover Pedido</button>
+    </form>
+    <a th:href="@{/clientes/area-cliente}" class="btn-secondary">Voltar para Área do Cliente</a>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+</body>
+</html>

@@ -32,31 +32,24 @@
     <section class="categories">
         <h2>Navegue por Categorias</h2>
         <div class="category-grid">
-            <a th:href="@{/produtos(categoria='ceramica')}" class="category-card">
+            <a th:href="@{/produtos(categoria='Cerâmica')}" class="category-card">
                 <span>🏺</span>
                 <h3>Cerâmica</h3>
             </a>
-            <a th:href="@{/produtos(categoria='texteis')}" class="category-card">
+            <a th:href="@{/produtos(categoria='Têxteis')}" class="category-card">
                 <span>🧶</span>
                 <h3>Têxteis</h3>
             </a>
-            <a th:href="@{/produtos(categoria='joias')}" class="category-card">
+            <a th:href="@{/produtos(categoria='Jóias')}" class="category-card">
                 <span>💍</span>
                 <h3>Jóias</h3>
             </a>
-            <a th:href="@{/produtos(categoria='madeira')}" class="category-card">
+            <a th:href="@{/produtos(categoria='Madeira')}" class="category-card">
                 <span>🪵</span>
                 <h3>Madeira</h3>
             </a>
         </div>
     </section>
-
-    <section class="meet-artisans">
-        <h2>Nossa alma são os nossos artesões</h2>
-        <p>Cada peça conta a história de quem a fez. Conheça alguns dos talentos por trás do nosso marketplace.</p>
-        <a th:href="@{/artesoes}" class="btn-secondary">Ver todos os artesões</a>
-    </section>
-
 </main>
 
 <footer th:replace="~{baseLayout :: baseFooterPage}"></footer>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<main class="conteudo">
+    <section class="form-container">
+        <h2>Editar Produto</h2>
+
+        <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
+        <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
+
+        <form th:action="@{/artesao/produtos/editar/processar}" th:object="${produtoUpdateDTO}" method="post">
+            
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label for="nome">Nome do Produto:</label>
+                <input type="text" id="nome" th:field="*{nome}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" th:field="*{descricao}" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="preco">Preço (R$):</label>
+                <input type="number" id="preco" th:field="*{preco}" step="0.01" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="estoque">Estoque:</label>
+                <input type="number" id="estoque" th:field="*{estoque}" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" th:field="*{categoriaId}" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option th:each="cat : ${categorias}" 
+                            th:value="${cat.id}" 
+                            th:text="${cat.nome}">
+                        Nome da Categoria
+                    </option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-primary">Salvar Alterações</button>
+            <a th:href="@{/artesao/dashboard}" class="btn-secondary">Cancelar</a>
+        </form>
+    </section>
+</main>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>

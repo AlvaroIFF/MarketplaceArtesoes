@@ -33,27 +33,33 @@ public class ItemPedido implements Serializable {
     @NotNull
     @Positive
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal precoUnitario; // Preço do produto no momento da compra!
+    private BigDecimal precoUnitario; 
 
-    // Relacionamento com Pedido (Muitos Itens para Um Pedido)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
 
-    // Relacionamento com Produto (Muitos ItensPedido podem se referir a um Produto)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
     public ItemPedido() {}
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
+    public ItemPedido(Integer quantidade, BigDecimal precoUnitario, Pedido pedido, Produto produto) {
+        this.quantidade = quantidade;
+        this.precoUnitario = precoUnitario;
+        this.pedido = pedido;
+        this.produto = produto;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public ItemPedido(Integer quantidade, BigDecimal precoUnitario, Produto produto) {
+        this.quantidade = quantidade;
+        this.precoUnitario = precoUnitario;
+        this.produto = produto;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Integer getQuantidade() {
@@ -86,5 +92,18 @@ public class ItemPedido implements Serializable {
 
     public void setProduto(Produto produto) {
         this.produto = produto;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemPedido that = (ItemPedido) o;
+        return getId() != null && getId().equals(that.getId()); 
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0; 
     }
 }

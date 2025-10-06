@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{baseLayout :: baseHead}"></head>
+<body>
+
+<header th:replace="~{baseLayout :: baseHeaderPage}"></header>
+
+<div class="store-page" th:object="${loja}">
+    <section class="store-banner" th:style="'background-image: url(' + (*{imagemBannerUrl} != null ? *{imagemBannerUrl} : '/images/default-banner.jpg') + ');'">
+        <div class="store-banner-overlay">
+            <h1 th:text="*{nome}">Nome da Loja</h1>
+            <p>Um espaço dedicado às criações de <strong th:text="*{nomeArtesao}">Nome do Artesão</strong>.</p>
+        </div>
+    </section>
+
+    <main class="conteudo-principal">
+        <div class="store-content">
+            <aside class="store-info">
+                <h3>Sobre a Loja</h3>
+                <p class="store-description" th:text="*{descricao}">Descrição da loja...</p>
+                <hr>
+                <h4>Contato</h4>
+                <p><strong>Artesão(ã):</strong> <span th:text="*{nomeArtesao}"></span></p>
+                <p><strong>E-mail:</strong> <span th:text="*{emailArtesao}"></span></p>
+                <p><strong>Telefone:</strong> <span th:text="*{contatoArtesao}"></span></p>
+            </aside>
+
+            <div class="store-products">
+                <h3>Produtos da Loja</h3>
+                <div th:if="${loja.produtos.isEmpty()}" class="empty-message">
+                    <p>Esta loja ainda não possui produtos cadastrados.</p>
+                </div>
+                <div class="product-grid">
+                    <div class="product-card" th:each="produto : *{produtos}">
+                        <a th:href="@{/produtos/{id}(id=${produto.id})}">
+                            <img th:src="${produto.imagemUrl}" alt="Foto do Produto">
+                            <h3 th:text="${produto.nome}">Nome do Produto</h3>
+                            <p class="price" th:text="${#numbers.formatCurrency(produto.preco)}">R$ 0,00</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer th:replace="~{baseLayout :: baseFooterPage}"></footer>
+
+</body>
+</html>

@@ -132,7 +132,7 @@ public abstract class Usuario implements Serializable {
     }
 
     public String getFotoUrl() {
-        return fotoUrl;
+        return this.fotoUrl;
     }
 
     public void setFotoUrl(String fotoUrl) {

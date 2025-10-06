@@ -1,10 +1,12 @@
 package br.edu.iff.ccc.marketplaceartesoes.entities;
 
 import java.io.Serializable;
-import java.math.BigDecimal; // Importando BigDecimal para precisão monetária
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -60,6 +62,7 @@ public class Produto implements Serializable {
     // Relacionamento com Loja (Muitos Produtos para Uma Loja)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loja_id", nullable = false)
+    @JsonIgnore
     private Loja loja;
 
     // Relacionamento com Categoria (Muitos Produtos para Muitas Categorias)
@@ -82,6 +85,11 @@ public class Produto implements Serializable {
         this.estoque = estoque;
         this.loja = loja;
         this.dtCriacao = LocalDate.now();
+    }
+
+    public void adicionarCategoria(Categoria categoria) {
+        this.categorias.add(categoria);
+        categoria.getProdutos().add(this);
     }
 
     // Getters e Setters
